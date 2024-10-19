@@ -2,6 +2,18 @@
 #define __EINSTELLUNGEN_H
 
 #include <Arduino.h>
+#include "defaults.h"
+
+// Bezeichnungen der Präferenzen in Preferences
+#define PREF_EINAUS "einaus"
+#define PREF_HELLIGKEIT "helligkeit"
+#define PREF_EFFEKTE "effekte"
+#define PREF_HG_SCHWARZ "hg_schwarz"
+#ifdef HAVE_BLUETOOTH
+#define PREF_BT_EINAUS "bteinaus"
+#define PREF_BT_DEVICE_NAME "btdn"
+#endif
+
 
 #define PREF_TO_STRING(x,y) String(x) + " = " + String(y) + "\n"
 

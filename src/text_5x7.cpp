@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "laufschrift.h"
+#include "text_5x7.h"
 #include "led_matrix.h"
 #include "effekt.h"
 

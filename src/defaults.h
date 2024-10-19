@@ -3,6 +3,8 @@
 
 
 #define SOFTWARE_RELEASE "0.5/20241018"
+#define HAVE_WEBSERVER
+#undef HAVE_BLUETOOTH
 
 
 #define TASTENWIEDERHOLZEIT 30 // und das sind 30 Millisekunden, also maximal 33 Inkrementschritte pro Sekunde
@@ -23,6 +25,9 @@
 #define HELLIGKEIT_MAX 255
 #define HELLIGKEIT_DEFAULT 128
 
+#ifdef HAVE_BLUETOOTH
+#define BT_DEFAULT_DEVICE_NAME "RPTU-Schild"
+#endif
 
 
 

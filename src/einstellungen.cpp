@@ -14,15 +14,7 @@ const char *releaseInfo = "      SW Rel. " SOFTWARE_RELEASE "      ";
  *                                                         *
  ***********************************************************/
 
-// Bezeichnungen der Präferenzen in Preferences
-#define PREF_EINAUS "einaus"
-#define PREF_HELLIGKEIT "helligkeit"
-#define PREF_EFFEKTE "effekte"
-#define PREF_HG_SCHWARZ "hg_schwarz"
-#ifdef HAVE_BLUETOOTH
-#define PREF_BT_EINAUS "bteinaus"
-#define PREF_BT_DEVICE_NAME "btdn"
-#endif
+
 
 #define PREF_EFFEKT_PAUSE_MAX "ep_max"
 #define PREF_EFFEKT_PAUSE_MIN "ep_min"
@@ -33,10 +25,6 @@ bool einaus;
 volatile uint8_t helligkeit;
 bool effekte_einaus;
 bool hintergrund_schwarz;
-#ifdef HAVE_BLUETOOTH
-uint8_t bt_einaus;
-String bt_device_name;
-#endif
 
 uint32_t effekt_pause_max;
 uint32_t effekt_pause_min;

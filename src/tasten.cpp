@@ -3,6 +3,10 @@
 #include "tasten.h"
 #include "einstellungen.h"
 #include "pins.h"
+#include "osd.h"
+#include "my_scheduler.h"
+#include "led_matrix.h"
+#include "defaults.h"
 
 /**************************************************************
  *                                                            *
@@ -42,7 +46,7 @@ void ARDUINO_ISR_ATTR ISR_taste_bt_ein_aus_pairing_clear() {
 }
 #endif
 
-void tasten_start() {
+void tasten_setup() {
   pinMode(EINAUS_PIN, INPUT);
   pinMode(HELLER_PIN, INPUT);
   pinMode(DUNKLER_PIN, INPUT);
@@ -58,3 +62,50 @@ void tasten_start() {
   attachInterrupt(digitalPinToInterrupt(BT_EINAUSPAIRINGCLEAR_PIN), ISR_taste_bt_ein_aus_pairing_clear, RISING);
 #endif
 }
+
+
+void tasten_loop() {
+  if (semaphore_taste_einaus) {
+    semaphore_taste_einaus = false;
+    einaus = !einaus;
+    preferences_speichern = true;
+  }
+  if (semaphore_taste_heller) {
+    semaphore_taste_heller = false;
+    semaphore_osd_helligkeit = true;
+    if (digitalRead(HELLER_PIN)) {
+      if (helligkeit < HELLIGKEIT_MAX) {
+        helligkeit++;
+        struct sTask *t = (struct sTask *) malloc(sizeof(struct sTask));
+        memset(t, 0, sizeof(struct sTask));
+        t->semaphore = &semaphore_taste_heller;
+        scheduleIn(t, TASTENWIEDERHOLZEIT);
+        semaphore_ledMatrix_update = true;
+        preferences_speichern = true;
+      }
+    }
+  }
+  if (semaphore_taste_dunkler) {
+    semaphore_taste_dunkler = false;
+    semaphore_osd_helligkeit = true;
+    if (digitalRead(DUNKLER_PIN)) {
+      if (helligkeit > HELLIGKEIT_MIN) {
+        helligkeit--;
+        struct sTask *t = (struct sTask *) malloc(sizeof(struct sTask));
+        memset(t, 0, sizeof(struct sTask));
+        t->semaphore = &semaphore_taste_dunkler;
+        scheduleIn(t, TASTENWIEDERHOLZEIT);
+        semaphore_ledMatrix_update = true;
+        preferences_speichern = true;
+      }
+    } 
+  }
+  if (semaphore_taste_effekte_ein_aus) {
+    semaphore_osd_effekte = true;
+    semaphore_taste_effekte_ein_aus = false;
+    if (osd_effekte_sichtbar) {
+      effekte_einaus = !effekte_einaus;
+    }
+  }
+}
+
