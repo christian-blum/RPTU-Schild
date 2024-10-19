@@ -2,6 +2,7 @@
 #include <Preferences.h>
 #include <math.h>
 
+#include "uebergang.h"
 #include "uebergang_kringel.h"
 #include "led_matrix.h"
 #include "konfiguration.h"
@@ -128,3 +129,18 @@ bool uebergang_kringel_linksrum(struct sKonfiguration *alt, struct sKonfiguratio
   return uebergang_kringel(alt, neu, -1);
 }
 
+Uebergang_Kringel::Uebergang_Kringel(int8_t richtung) {
+  winkelvorzeichen = richtung;
+}
+
+void Uebergang_Kringel::prefs_laden(Preferences p) {
+  uebergang_kringel_prefs_laden(p);
+}
+
+void Uebergang_Kringel::prefs_schreiben(Preferences p) {
+  uebergang_kringel_prefs_schreiben(p);
+}
+
+String Uebergang_Kringel::prefs_ausgeben() {
+  return uebergang_kringel_prefs_ausgeben();
+}

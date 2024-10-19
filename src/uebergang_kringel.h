@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <Preferences.h>
 
+#include "uebergang.h"
+
 #define KRINGEL_STEPS 90
 #define KRINGEL_DELAY 40
 
@@ -16,5 +18,18 @@ bool uebergang_kringel_linksrum(struct sKonfiguration *alt, struct sKonfiguratio
 void uebergang_kringel_prefs_laden(Preferences p);
 String uebergang_kringel_prefs_ausgeben();
 void uebergang_kringel_prefs_schreiben(Preferences p);
+
+class Uebergang_Kringel : public Uebergang {
+private:
+  int8_t winkelvorzeichen;
+
+public:
+  Uebergang_Kringel(int8_t richtung); // +1 oder -1
+
+  void prefs_laden(Preferences p) override;
+  void prefs_schreiben(Preferences p) override;
+  String prefs_ausgeben() override;
+  bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
+};
 
 #endif

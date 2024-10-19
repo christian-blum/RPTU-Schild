@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "uebergang.h"
 #include "uebergang_slot_machine.h"
 #include "uebergaenge.h"
 #include "einstellungen.h"
@@ -139,4 +140,21 @@ bool uebergang_slot_machine(struct sKonfiguration *alt, struct sKonfiguration *n
     return false;
   }
   return true;
+}
+
+
+void Uebergang_Slot_Machine::prefs_laden(Preferences p) {
+  uebergang_slot_machine_prefs_laden(p);
+}
+
+void Uebergang_Slot_Machine::prefs_schreiben(Preferences p) {
+  uebergang_slot_machine_prefs_schreiben(p);
+}
+
+String Uebergang_Slot_Machine::prefs_ausgeben() {
+  return uebergang_slot_machine_prefs_ausgeben();
+}
+
+bool Uebergang_Slot_Machine::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_slot_machine(alt, neu);
 }

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "uebergang.h"
 #include "uebergang_epilleptischer_anfall.h"
 #include "uebergaenge.h"
 #include "konfiguration.h"
@@ -44,3 +45,18 @@ bool uebergang_epilleptischer_anfall(struct sKonfiguration *alt, struct sKonfigu
   return false;
 }
 
+void Uebergang_Epilleptischer_Anfall::prefs_laden(Preferences p) {
+  uebergang_epilleptischer_anfall_prefs_laden(p);
+}
+
+void Uebergang_Epilleptischer_Anfall::prefs_schreiben(Preferences p) {
+  uebergang_epilleptischer_anfall_prefs_schreiben(p);
+}
+
+String Uebergang_Epilleptischer_Anfall::prefs_ausgeben() {
+  return uebergang_epilleptischer_anfall_prefs_ausgeben();
+}
+
+bool Uebergang_Epilleptischer_Anfall::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_epilleptischer_anfall(alt, neu);
+}

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 
+#include "uebergang.h"
 #include "uebergaenge.h"
 #include "uebergang_blend.h"
 #include "led_matrix.h"
@@ -62,3 +63,18 @@ bool uebergang_blend(struct sKonfiguration *alt, struct sKonfiguration *neu) {
   return false;
 }
 
+void Uebergang_Blend::prefs_laden(Preferences p) {
+  uebergang_blend_prefs_laden(p);
+}
+
+void Uebergang_Blend::prefs_schreiben(Preferences p) {
+  uebergang_blend_prefs_schreiben(p);
+}
+
+String Uebergang_Blend::prefs_ausgeben() {
+  return uebergang_blend_prefs_ausgeben();
+}
+
+bool Uebergang_Blend::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_blend(alt, neu);
+}

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Preferences.h>
 
+#include "uebergang.h"
 #include "uebergang_morph.h"
 #include "einstellungen.h"
 #include "led_matrix.h"
@@ -54,3 +55,18 @@ bool uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu) {
 }
 
 
+void Uebergang_Morph::prefs_laden(Preferences p) {
+  uebergang_morph_prefs_laden(p);
+}
+
+void Uebergang_Morph::prefs_schreiben(Preferences p) {
+  uebergang_morph_prefs_schreiben(p);
+}
+
+String Uebergang_Morph::prefs_ausgeben() {
+  return uebergang_morph_prefs_ausgeben();
+}
+
+bool Uebergang_Morph::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_morph(alt, neu);
+}

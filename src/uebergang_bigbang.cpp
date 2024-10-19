@@ -59,4 +59,18 @@ bool uebergang_bigbang(struct sKonfiguration *alt, struct sKonfiguration *neu) {
   }
 }
 
+void Uebergang_Bigbang::prefs_laden(Preferences p) {
+  uebergang_bigbang_prefs_laden(p);
+}
 
+void Uebergang_Bigbang::prefs_schreiben(Preferences p) {
+  uebergang_bigbang_prefs_schreiben(p);
+}
+
+String Uebergang_Bigbang::prefs_ausgeben() {
+  return uebergang_bigbang_prefs_ausgeben();
+}
+
+bool Uebergang_Bigbang::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_bigbang(alt, neu);
+}

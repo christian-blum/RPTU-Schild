@@ -1,3 +1,7 @@
+#include <Arduino.h>
+#include <Preferences.h>
+
+#include "uebergang.h"
 #include "uebergang_jump.h"
 #include "einstellungen.h"
 
@@ -8,3 +12,15 @@ bool uebergang_jump(struct sKonfiguration *alteKonfiguration, struct sKonfigurat
   return true;
 }
 
+void Uebergang_Jump::prefs_laden(Preferences p) {
+}
+
+void Uebergang_Jump::prefs_schreiben(Preferences p) {
+}
+
+String Uebergang_Jump::prefs_ausgeben() {
+}
+
+bool Uebergang_Jump::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_jump(alt, neu);
+}
