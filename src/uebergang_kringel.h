@@ -16,7 +16,7 @@ bool uebergang_kringel(struct sKonfiguration *alt, struct sKonfiguration *neu, i
 bool uebergang_kringel_rechtsrum(struct sKonfiguration *alt, struct sKonfiguration *neu);
 bool uebergang_kringel_linksrum(struct sKonfiguration *alt, struct sKonfiguration *neu);
 void uebergang_kringel_prefs_laden(Preferences p);
-String uebergang_kringel_prefs_ausgeben();
+void uebergang_kringel_prefs_ausgeben(String& p);
 void uebergang_kringel_prefs_schreiben(Preferences p);
 
 class Uebergang_Kringel : public Uebergang {
@@ -28,7 +28,7 @@ public:
 
   void prefs_laden(Preferences p) override;
   void prefs_schreiben(Preferences p) override;
-  String prefs_ausgeben() override;
+  void prefs_ausgeben(String& p) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

@@ -40,14 +40,14 @@ volatile bool preferences_speichern;
 
 void preferences_ausgeben() {
   String s;
-  s += PREF_TO_STRING(PREF_EINAUS, einaus);
-  s += PREF_TO_STRING(PREF_EFFEKTE, effekte_einaus);
-  s += PREF_TO_STRING(PREF_HG_SCHWARZ, hintergrund_schwarz);
-  s += uebergaenge_prefs_ausgeben();
-  s += PREF_TO_STRING(PREF_EFFEKT_PAUSE_MAX, effekt_pause_max);
-  s += PREF_TO_STRING(PREF_EFFEKT_PAUSE_MIN, effekt_pause_min);
-  s += PREF_TO_STRING(PREF_LAUFSCHRIFT_DELAY, laufschrift_delay);
-  s += PREF_TO_STRING(PREF_KONFIGURATION_PAUSE, konfiguration_pause);
+  PREF_APPEND(s, PREF_EINAUS, einaus);
+  PREF_APPEND(s, PREF_EFFEKTE, effekte_einaus);
+  PREF_APPEND(s, PREF_HG_SCHWARZ, hintergrund_schwarz);
+  uebergaenge_prefs_ausgeben(s);
+  PREF_APPEND(s, PREF_EFFEKT_PAUSE_MAX, effekt_pause_max);
+  PREF_APPEND(s, PREF_EFFEKT_PAUSE_MIN, effekt_pause_min);
+  PREF_APPEND(s, PREF_LAUFSCHRIFT_DELAY, laufschrift_delay);
+  PREF_APPEND(s, PREF_KONFIGURATION_PAUSE, konfiguration_pause);
   Serial.print(s);
 }
 

@@ -22,8 +22,9 @@ void uebergang_kringel_prefs_laden(Preferences p) {
   uebergang_kringel_delay = p.getUShort(PREF_KRINGEL_DELAY, KRINGEL_DELAY);
 }
 
-String uebergang_kringel_prefs_ausgeben() {
-  return PREF_TO_STRING(PREF_KRINGEL_STEPS, uebergang_kringel_steps) + PREF_TO_STRING(PREF_KRINGEL_DELAY, uebergang_kringel_delay);
+void uebergang_kringel_prefs_ausgeben(String& p) {
+  PREF_APPEND(p, PREF_KRINGEL_STEPS, uebergang_kringel_steps);
+  PREF_APPEND(p, PREF_KRINGEL_DELAY, uebergang_kringel_delay);
 }
 
 void uebergang_kringel_prefs_schreiben(Preferences p) {
@@ -141,6 +142,6 @@ void Uebergang_Kringel::prefs_schreiben(Preferences p) {
   uebergang_kringel_prefs_schreiben(p);
 }
 
-String Uebergang_Kringel::prefs_ausgeben() {
-  return uebergang_kringel_prefs_ausgeben();
+void Uebergang_Kringel::prefs_ausgeben(String& p) {
+  uebergang_kringel_prefs_ausgeben(p);
 }

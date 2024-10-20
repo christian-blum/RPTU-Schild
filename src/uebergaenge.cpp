@@ -104,15 +104,13 @@ void uebergaenge_prefs_schreiben(Preferences p) {
   uebergang_slot_machine_prefs_schreiben(p);
 }
 
-String uebergaenge_prefs_ausgeben() {
-  String p = String();
-  p += uebergang_morph_prefs_ausgeben();
-  p += uebergang_blend_prefs_ausgeben();
-  p += uebergang_bigbang_prefs_ausgeben();
-  p += uebergang_kringel_prefs_ausgeben();
-  p += uebergang_epilleptischer_anfall_prefs_ausgeben();
-  p += uebergang_slot_machine_prefs_ausgeben();
-  return p;
+void uebergaenge_prefs_ausgeben(String& p) {
+  uebergang_morph_prefs_ausgeben(p);
+  uebergang_blend_prefs_ausgeben(p);
+  uebergang_bigbang_prefs_ausgeben(p);
+  uebergang_kringel_prefs_ausgeben(p);
+  uebergang_epilleptischer_anfall_prefs_ausgeben(p);
+  uebergang_slot_machine_prefs_ausgeben(p);
 }
 
 

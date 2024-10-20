@@ -8,7 +8,7 @@ class Uebergang {
 public:
   virtual void prefs_laden(Preferences p);
   virtual void prefs_schreiben(Preferences p);
-  virtual String prefs_ausgeben();
+  virtual void prefs_ausgeben(String & p);
   virtual bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu);
 };
 

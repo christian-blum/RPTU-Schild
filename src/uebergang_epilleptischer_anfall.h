@@ -12,7 +12,7 @@
 
 bool uebergang_epilleptischer_anfall(struct sKonfiguration *alt, struct sKonfiguration *neu);
 void uebergang_epilleptischer_anfall_prefs_laden(Preferences p);
-String uebergang_epilleptischer_anfall_prefs_ausgeben();
+void uebergang_epilleptischer_anfall_prefs_ausgeben(String& p);
 void uebergang_epilleptischer_anfall_prefs_schreiben(Preferences p);
 
 class Uebergang_Epilleptischer_Anfall : public Uebergang {
@@ -20,7 +20,7 @@ public:
 
   void prefs_laden(Preferences p) override;
   void prefs_schreiben(Preferences p) override;
-  String prefs_ausgeben() override;
+  void prefs_ausgeben(String& p) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

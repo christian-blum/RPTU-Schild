@@ -18,7 +18,7 @@ extern uint16_t uebergang_slot_delay;
 
 bool uebergang_slot_machine(struct sKonfiguration *alt, struct sKonfiguration *neu);
 void uebergang_slot_machine_prefs_laden(Preferences p);
-String uebergang_slot_machine_prefs_ausgeben();
+void uebergang_slot_machine_prefs_ausgeben(String& p);
 void uebergang_slot_machine_prefs_schreiben(Preferences p);
 
 class Uebergang_Slot_Machine : public Uebergang {
@@ -26,7 +26,7 @@ public:
 
   void prefs_laden(Preferences p) override;
   void prefs_schreiben(Preferences p) override;
-  String prefs_ausgeben() override;
+  void prefs_ausgeben(String& p) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

@@ -19,8 +19,9 @@ void uebergang_morph_prefs_laden(Preferences p) {
   uebergang_morph_delay = p.getUShort(PREF_MORPH_DELAY, MORPH_DELAY);
 }
 
-String uebergang_morph_prefs_ausgeben() {
-  return PREF_TO_STRING(PREF_MORPH_STEPS, uebergang_morph_steps) + PREF_TO_STRING(PREF_MORPH_DELAY, uebergang_morph_delay);
+void uebergang_morph_prefs_ausgeben(String& p) {
+  PREF_APPEND(p, PREF_MORPH_STEPS, uebergang_morph_steps);
+  PREF_APPEND(p, PREF_MORPH_DELAY, uebergang_morph_delay);
 }
 
 void uebergang_morph_prefs_schreiben(Preferences p) {
@@ -63,8 +64,8 @@ void Uebergang_Morph::prefs_schreiben(Preferences p) {
   uebergang_morph_prefs_schreiben(p);
 }
 
-String Uebergang_Morph::prefs_ausgeben() {
-  return uebergang_morph_prefs_ausgeben();
+void Uebergang_Morph::prefs_ausgeben(String& p) {
+  uebergang_morph_prefs_ausgeben(p);
 }
 
 bool Uebergang_Morph::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

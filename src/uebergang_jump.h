@@ -10,7 +10,7 @@ public:
 
   void prefs_laden(Preferences p) override;
   void prefs_schreiben(Preferences p) override;
-  String prefs_ausgeben() override;
+  void prefs_ausgeben(String& p) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

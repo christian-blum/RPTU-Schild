@@ -20,8 +20,9 @@ void uebergang_epilleptischer_anfall_prefs_laden(Preferences p) {
   uebergang_ea_delay = p.getUShort(PREF_EA_DELAY, EPILLEPTISCHER_ANFALL_DELAY);
 }
 
-String uebergang_epilleptischer_anfall_prefs_ausgeben() {
-  return PREF_TO_STRING(PREF_EA_STEPS, uebergang_ea_steps) + PREF_TO_STRING(PREF_EA_DELAY, uebergang_ea_delay);
+void uebergang_epilleptischer_anfall_prefs_ausgeben(String& p) {
+  PREF_APPEND(p, PREF_EA_STEPS, uebergang_ea_steps);
+  PREF_APPEND(p, PREF_EA_DELAY, uebergang_ea_delay);
 }
 
 void uebergang_epilleptischer_anfall_prefs_schreiben(Preferences p) {
@@ -53,8 +54,8 @@ void Uebergang_Epilleptischer_Anfall::prefs_schreiben(Preferences p) {
   uebergang_epilleptischer_anfall_prefs_schreiben(p);
 }
 
-String Uebergang_Epilleptischer_Anfall::prefs_ausgeben() {
-  return uebergang_epilleptischer_anfall_prefs_ausgeben();
+void Uebergang_Epilleptischer_Anfall::prefs_ausgeben(String& p) {
+  uebergang_epilleptischer_anfall_prefs_ausgeben(p);
 }
 
 bool Uebergang_Epilleptischer_Anfall::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

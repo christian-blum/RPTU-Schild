@@ -23,8 +23,9 @@ void uebergang_bigbang_prefs_laden(Preferences p) {
   uebergang_bigbang_delay = p.getUShort(PREF_BIGBANG_DELAY, BIGBANG_DELAY);
 }
 
-String uebergang_bigbang_prefs_ausgeben() {
-  return PREF_TO_STRING(PREF_BIGBANG_STEPS, uebergang_bigbang_steps) + PREF_TO_STRING(PREF_BIGBANG_DELAY, uebergang_bigbang_delay);
+void uebergang_bigbang_prefs_ausgeben(String& p) {
+  PREF_APPEND(p, PREF_BIGBANG_STEPS, uebergang_bigbang_steps);
+  PREF_APPEND(p, PREF_BIGBANG_DELAY, uebergang_bigbang_delay);
 }
 
 void uebergang_bigbang_prefs_schreiben(Preferences p) {
@@ -67,8 +68,8 @@ void Uebergang_Bigbang::prefs_schreiben(Preferences p) {
   uebergang_bigbang_prefs_schreiben(p);
 }
 
-String Uebergang_Bigbang::prefs_ausgeben() {
-  return uebergang_bigbang_prefs_ausgeben();
+void Uebergang_Bigbang::prefs_ausgeben(String& p) {
+  uebergang_bigbang_prefs_ausgeben(p);
 }
 
 bool Uebergang_Bigbang::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

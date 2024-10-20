@@ -23,8 +23,9 @@ void uebergang_blend_prefs_laden(Preferences p) {
   uebergang_blend_delay = p.getUShort(PREF_BLEND_DELAY, BLEND_DELAY);
 }
 
-String uebergang_blend_prefs_ausgeben() {
-  return PREF_TO_STRING(PREF_BLEND_STEPS, uebergang_blend_steps) + PREF_TO_STRING(PREF_BLEND_DELAY, uebergang_blend_delay);
+void uebergang_blend_prefs_ausgeben(String& p) {
+  PREF_APPEND(p, PREF_BLEND_STEPS, uebergang_blend_steps);
+  PREF_APPEND(p, PREF_BLEND_DELAY, uebergang_blend_delay);
 }
 
 void uebergang_blend_prefs_schreiben(Preferences p) {
@@ -71,8 +72,8 @@ void Uebergang_Blend::prefs_schreiben(Preferences p) {
   uebergang_blend_prefs_schreiben(p);
 }
 
-String Uebergang_Blend::prefs_ausgeben() {
-  return uebergang_blend_prefs_ausgeben();
+void Uebergang_Blend::prefs_ausgeben(String& p) {
+  uebergang_blend_prefs_ausgeben(p);
 }
 
 bool Uebergang_Blend::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

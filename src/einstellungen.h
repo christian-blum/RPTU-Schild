@@ -15,7 +15,7 @@
 #endif
 
 
-#define PREF_TO_STRING(x,y) String(x) + " = " + String(y) + "\n"
+#define PREF_APPEND(s,x,y) s += x; s += " = "; s += y; s += "\n";
 
 extern bool einaus;
 extern volatile uint8_t helligkeit;

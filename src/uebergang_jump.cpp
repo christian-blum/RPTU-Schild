@@ -18,8 +18,7 @@ void Uebergang_Jump::prefs_laden(Preferences p) {
 void Uebergang_Jump::prefs_schreiben(Preferences p) {
 }
 
-String Uebergang_Jump::prefs_ausgeben() {
-  return "";
+void Uebergang_Jump::prefs_ausgeben(String& p) {
 }
 
 bool Uebergang_Jump::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

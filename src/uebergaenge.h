@@ -11,7 +11,7 @@ struct sCRGBA morph_color(struct sCRGBA alt, struct sCRGBA neu, uint32_t i, uint
 
 void uebergaenge_prefs_laden(Preferences p);
 void uebergaenge_prefs_schreiben(Preferences p);
-String uebergaenge_prefs_ausgeben();
+void uebergaenge_prefs_ausgeben(String& p);
 void uebergaenge_laden();
 void uebergaenge_speichern();
 void setup_uebergaenge();
