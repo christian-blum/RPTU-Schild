@@ -17,6 +17,16 @@ void uebergang_epilleptischer_anfall_prefs_schreiben(Preferences& p);
 
 class Uebergang_Epilleptischer_Anfall : public Uebergang {
 public:
+  Uebergang_Epilleptischer_Anfall(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
+
+  const char* name = "Epilleptischer Anfall";
+  const char* beschreibung = "Hektisches Geflacker mit realer Gefahr für empfindliche Menschen.";
+  const char* tag = "ea";
+
+  uint16_t default_steps;
+  uint16_t steps;
+  uint16_t default_delay;
+  uint16_t delay;
 
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;

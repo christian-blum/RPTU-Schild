@@ -21,15 +21,34 @@ void uebergang_kringel_prefs_schreiben(Preferences& p);
 
 class Uebergang_Kringel : public Uebergang {
 private:
-  int8_t winkelvorzeichen;
 
 public:
-  Uebergang_Kringel(int8_t richtung); // +1 oder -1
+  Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay, int8_t richtung); // +1 oder -1
+
+  const char* name = "Kringel";
+  const char* beschreibung = "Buchstaben rotieren mit unterschiedlicher Geschwindigkeit und wechseln dabei gegebenenfalls nach und nach die Umlaufbahn. Rechtsrum oder linksrum.";
+  const char* tag = "kringel";
+
+  uint16_t default_steps;
+  uint16_t steps;
+  uint16_t default_delay;
+  uint16_t delay;
+  int8_t richtung;
 
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;
   void prefs_ausgeben(String& s) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
+};
+
+class Uebergang_Kringel_linksrum : public Uebergang_Kringel {
+public:
+  Uebergang_Kringel_linksrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
+};
+
+class Uebergang_Kringel_rechtsrum : public Uebergang_Kringel {
+public:
+  Uebergang_Kringel_rechtsrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
 };
 
 #endif

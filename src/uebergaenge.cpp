@@ -8,7 +8,7 @@
 #include "uebergang_blend.h"
 #include "uebergang_morph.h"
 #include "uebergang_slot_machine.h"
-#include "uebergang_bigbang.h"
+#include "uebergang_big_bang.h"
 #include "uebergang_kringel.h"
 #include "uebergang_epilleptischer_anfall.h"
 
@@ -69,14 +69,14 @@ static const struct sUebergangDef uebergaenge_defaults[] = {
 
 #define UEBERGAENGE_ANZAHL (sizeof(uebergaenge_defaults) / sizeof(uebergaenge_defaults[0]))
 
-static struct sUebergang uebergaenge[UEBERGAENGE_ANZAHL];
+static struct sUebergang uebergaenge_alt[UEBERGAENGE_ANZAHL];
 static uint32_t uebergaenge_summe_gewichte;
 
 static void uebergaenge_gewichtungen_summieren() {
   uebergaenge_summe_gewichte = 0;
   for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
     struct sUebergang *u;
-    u = &uebergaenge[i];
+    u = &uebergaenge_alt[i];
     if (u->aktiv) uebergaenge_summe_gewichte += u->gewichtung;
   }
 }
@@ -127,7 +127,7 @@ void uebergaenge_laden() {
   p.begin("uebergaenge", true);
   for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
     const struct sUebergangDef *d = &uebergaenge_defaults[i];
-    struct sUebergang *u = &uebergaenge[i];
+    struct sUebergang *u = &uebergaenge_alt[i];
     u->aktiv = d->gewichtung;
     u->gewichtung = d->gewichtung;
     u->funktion = d->funktion;
@@ -167,7 +167,7 @@ void uebergaenge_speichern() {
   p.begin("uebergaenge", false);
   for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
     const struct sUebergangDef *d = &uebergaenge_defaults[i];
-    const struct sUebergang *u = &uebergaenge[i];
+    const struct sUebergang *u = &uebergaenge_alt[i];
     String x = String(u->aktiv ? "1;":"0;");
     x += u->gewichtung;
     p.putString(d->name, x);
@@ -189,7 +189,7 @@ bool (*wuerfele_uebergang())(struct sKonfiguration *alt, struct sKonfiguration *
   int32_t x = random(uebergaenge_summe_gewichte);
   struct sUebergang *u;
   for (int i = 0; i < UEBERGAENGE_ANZAHL && x >= 0; i++) {
-    u = &uebergaenge[i];
+    u = &uebergaenge_alt[i];
     if (!u->aktiv) continue;
     x -= u->gewichtung;
   }
@@ -215,3 +215,22 @@ void base_pipeline_fuellen() {
 }
 
 
+
+
+
+
+/***************************************************************/
+/* So, und ab hier machen wir es jetzt richtig, nach und nach. */
+/***************************************************************/
+
+/* Hier wird festgelegt, welche Übergänge es gibt. Die Parameter sind nur Defaults. */
+Uebergang uebergaenge[] = {
+  Uebergang_Jump(true, 100),
+  Uebergang_Morph(true, 100, 40, 50),
+  Uebergang_Blend(true, 100, 20, 50),
+  Uebergang_Slot_Machine(true, 150),
+  Uebergang_Big_Bang(true, 150, 40, 50),
+  Uebergang_Kringel_linksrum(true, 75, 90, 40),
+  Uebergang_Kringel_rechtsrum(true, 75, 90, 40),
+  Uebergang_Epilleptischer_Anfall(true, 20, 30, 110),
+};

@@ -23,6 +23,11 @@ void uebergang_slot_machine_prefs_schreiben(Preferences& p);
 
 class Uebergang_Slot_Machine : public Uebergang {
 public:
+  using Uebergang::Uebergang;
+
+  const char* name = "Slot Machine";
+  const char* beschreibung = "Willkommen in Las Vegas, nur ohne Münzschlitz!";
+  const char* tag = "sm";
 
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;

@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "uebergang_bigbang.h"
+#include "uebergang_big_bang.h"
 #include "einstellungen.h"
 #include "led_matrix.h"
 #include "uebergaenge.h"
@@ -60,18 +60,24 @@ bool uebergang_bigbang(struct sKonfiguration *alt, struct sKonfiguration *neu) {
   }
 }
 
-void Uebergang_Bigbang::prefs_laden(Preferences& p) {
+
+Uebergang_Big_Bang::Uebergang_Big_Bang(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang(aktiv, gewichtung) {
+  Uebergang_Big_Bang::steps = default_steps = steps;
+  Uebergang_Big_Bang::delay = default_delay = delay;
+}
+
+void Uebergang_Big_Bang::prefs_laden(Preferences& p) {
   uebergang_bigbang_prefs_laden(p);
 }
 
-void Uebergang_Bigbang::prefs_schreiben(Preferences& p) {
+void Uebergang_Big_Bang::prefs_schreiben(Preferences& p) {
   uebergang_bigbang_prefs_schreiben(p);
 }
 
-void Uebergang_Bigbang::prefs_ausgeben(String& p) {
+void Uebergang_Big_Bang::prefs_ausgeben(String& p) {
   uebergang_bigbang_prefs_ausgeben(p);
 }
 
-bool Uebergang_Bigbang::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+bool Uebergang_Big_Bang::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
   return uebergang_bigbang(alt, neu);
 }

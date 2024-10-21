@@ -17,8 +17,19 @@ void uebergang_bigbang_prefs_laden(Preferences& p);
 void uebergang_bigbang_prefs_ausgeben(String& s);
 void uebergang_bigbang_prefs_schreiben(Preferences& p);
 
-class Uebergang_Bigbang : public Uebergang {
+class Uebergang_Big_Bang : public Uebergang {
 public:
+  Uebergang_Big_Bang(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
+
+  const char* name = "Big Bang";
+  const char* beschreibung = "Buchstaben kollabieren im Gravitationszentrum und explodieren von dort in eine neue Position, wie Materie in einem oszillierenden Universum.";
+  const char* tag = "big_bang";
+
+  uint16_t default_steps;
+  uint16_t steps;
+  uint16_t default_delay;
+  uint16_t delay;
+
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;
   void prefs_ausgeben(String& s) override;

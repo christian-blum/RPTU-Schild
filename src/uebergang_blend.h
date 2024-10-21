@@ -19,6 +19,16 @@ void uebergang_blend_prefs_schreiben(Preferences& p);
 
 class Uebergang_Blend : public Uebergang {
 public:
+  Uebergang_Blend(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
+
+  const char* name = "Blend";
+  const char* beschreibung = "Weiche Überblende von einem zum anderen Zustand.";
+  const char* tag = "blend";
+
+  uint16_t default_steps;
+  uint16_t steps;
+  uint16_t default_delay;
+  uint16_t delay;
 
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;

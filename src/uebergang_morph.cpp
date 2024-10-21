@@ -56,6 +56,16 @@ bool uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu) {
 }
 
 
+
+
+
+Uebergang_Morph::Uebergang_Morph(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang(aktiv, gewichtung) {
+  Uebergang_Morph::steps = default_steps = steps;
+  Uebergang_Morph::delay = default_delay = delay;
+}
+
+
+
 void Uebergang_Morph::prefs_laden(Preferences& p) {
   uebergang_morph_prefs_laden(p);
 }

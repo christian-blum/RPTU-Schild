@@ -130,8 +130,16 @@ bool uebergang_kringel_linksrum(struct sKonfiguration *alt, struct sKonfiguratio
   return uebergang_kringel(alt, neu, -1);
 }
 
-Uebergang_Kringel::Uebergang_Kringel(int8_t richtung) {
-  winkelvorzeichen = richtung;
+Uebergang_Kringel::Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay, int8_t richtung) : Uebergang(aktiv, gewichtung) {
+  Uebergang_Kringel::steps = default_steps = steps;
+  Uebergang_Kringel::delay = default_delay = delay;
+  Uebergang_Kringel::richtung = richtung;
+}
+
+Uebergang_Kringel_linksrum::Uebergang_Kringel_linksrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang_Kringel(aktiv, gewichtung, steps, delay, -1) {
+}
+
+Uebergang_Kringel_rechtsrum::Uebergang_Kringel_rechtsrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang_Kringel(aktiv, gewichtung, steps, delay, +1) {
 }
 
 void Uebergang_Kringel::prefs_laden(Preferences& p) {

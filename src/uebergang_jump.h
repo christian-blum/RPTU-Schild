@@ -7,6 +7,11 @@ bool uebergang_jump(struct sKonfiguration *alteKonfiguration, struct sKonfigurat
 
 class Uebergang_Jump : public Uebergang {
 public:
+  using Uebergang::Uebergang;
+
+  const char* name = "Jump";
+  const char* beschreibung = "Simpler Sprung von einer Darstellung zur anderen.";
+  const char* tag = "jump";
 
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;

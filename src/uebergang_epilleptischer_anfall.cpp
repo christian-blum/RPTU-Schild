@@ -46,6 +46,14 @@ bool uebergang_epilleptischer_anfall(struct sKonfiguration *alt, struct sKonfigu
   return false;
 }
 
+
+
+
+Uebergang_Epilleptischer_Anfall::Uebergang_Epilleptischer_Anfall(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang(aktiv, gewichtung) {
+  Uebergang_Epilleptischer_Anfall::steps = default_steps = steps;
+  Uebergang_Epilleptischer_Anfall::delay = default_delay = delay;
+}
+
 void Uebergang_Epilleptischer_Anfall::prefs_laden(Preferences& p) {
   uebergang_epilleptischer_anfall_prefs_laden(p);
 }
