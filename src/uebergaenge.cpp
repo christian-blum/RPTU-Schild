@@ -86,7 +86,7 @@ static void uebergaenge_gewichtungen_summieren() {
 #undef DEBUG_UEBERGAENGE_LADEN
 
 
-void uebergaenge_prefs_laden(Preferences p) {
+void uebergaenge_prefs_laden(Preferences& p) {
   uebergang_morph_prefs_laden(p);
   uebergang_blend_prefs_laden(p);
   uebergang_bigbang_prefs_laden(p);
@@ -95,7 +95,7 @@ void uebergaenge_prefs_laden(Preferences p) {
   uebergang_slot_machine_prefs_laden(p);
 }
 
-void uebergaenge_prefs_schreiben(Preferences p) {
+void uebergaenge_prefs_schreiben(Preferences& p) {
   uebergang_morph_prefs_schreiben(p);
   uebergang_blend_prefs_schreiben(p);
   uebergang_bigbang_prefs_schreiben(p);
@@ -104,13 +104,13 @@ void uebergaenge_prefs_schreiben(Preferences p) {
   uebergang_slot_machine_prefs_schreiben(p);
 }
 
-void uebergaenge_prefs_ausgeben(String& p) {
-  uebergang_morph_prefs_ausgeben(p);
-  uebergang_blend_prefs_ausgeben(p);
-  uebergang_bigbang_prefs_ausgeben(p);
-  uebergang_kringel_prefs_ausgeben(p);
-  uebergang_epilleptischer_anfall_prefs_ausgeben(p);
-  uebergang_slot_machine_prefs_ausgeben(p);
+void uebergaenge_prefs_ausgeben(String& s) {
+  uebergang_morph_prefs_ausgeben(s);
+  uebergang_blend_prefs_ausgeben(s);
+  uebergang_bigbang_prefs_ausgeben(s);
+  uebergang_kringel_prefs_ausgeben(s);
+  uebergang_epilleptischer_anfall_prefs_ausgeben(s);
+  uebergang_slot_machine_prefs_ausgeben(s);
 }
 
 

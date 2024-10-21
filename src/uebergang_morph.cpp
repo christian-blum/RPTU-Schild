@@ -14,17 +14,17 @@
 uint16_t uebergang_morph_steps;
 uint16_t uebergang_morph_delay;
 
-void uebergang_morph_prefs_laden(Preferences p) {
+void uebergang_morph_prefs_laden(Preferences& p) {
   uebergang_morph_steps = p.getUShort(PREF_MORPH_STEPS, MORPH_STEPS);
   uebergang_morph_delay = p.getUShort(PREF_MORPH_DELAY, MORPH_DELAY);
 }
 
-void uebergang_morph_prefs_ausgeben(String& p) {
-  PREF_APPEND(p, PREF_MORPH_STEPS, uebergang_morph_steps);
-  PREF_APPEND(p, PREF_MORPH_DELAY, uebergang_morph_delay);
+void uebergang_morph_prefs_ausgeben(String& s) {
+  PREF_APPEND(s, PREF_MORPH_STEPS, uebergang_morph_steps);
+  PREF_APPEND(s, PREF_MORPH_DELAY, uebergang_morph_delay);
 }
 
-void uebergang_morph_prefs_schreiben(Preferences p) {
+void uebergang_morph_prefs_schreiben(Preferences& p) {
   if (p.getUShort(PREF_MORPH_STEPS) != uebergang_morph_steps) p.putUShort(PREF_MORPH_STEPS, uebergang_morph_steps);
   if (p.getUShort(PREF_MORPH_DELAY) != uebergang_morph_delay) p.putUShort(PREF_MORPH_DELAY, uebergang_morph_delay);
 }
@@ -56,16 +56,16 @@ bool uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu) {
 }
 
 
-void Uebergang_Morph::prefs_laden(Preferences p) {
+void Uebergang_Morph::prefs_laden(Preferences& p) {
   uebergang_morph_prefs_laden(p);
 }
 
-void Uebergang_Morph::prefs_schreiben(Preferences p) {
+void Uebergang_Morph::prefs_schreiben(Preferences& p) {
   uebergang_morph_prefs_schreiben(p);
 }
 
-void Uebergang_Morph::prefs_ausgeben(String& p) {
-  uebergang_morph_prefs_ausgeben(p);
+void Uebergang_Morph::prefs_ausgeben(String& s) {
+  uebergang_morph_prefs_ausgeben(s);
 }
 
 bool Uebergang_Morph::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

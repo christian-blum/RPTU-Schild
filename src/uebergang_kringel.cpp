@@ -17,17 +17,17 @@ uint16_t uebergang_kringel_delay;
 #define PREF_KRINGEL_DELAY "kringel_delay"
 
 
-void uebergang_kringel_prefs_laden(Preferences p) {
+void uebergang_kringel_prefs_laden(Preferences& p) {
   uebergang_kringel_steps = p.getUShort(PREF_KRINGEL_STEPS, KRINGEL_STEPS);
   uebergang_kringel_delay = p.getUShort(PREF_KRINGEL_DELAY, KRINGEL_DELAY);
 }
 
-void uebergang_kringel_prefs_ausgeben(String& p) {
-  PREF_APPEND(p, PREF_KRINGEL_STEPS, uebergang_kringel_steps);
-  PREF_APPEND(p, PREF_KRINGEL_DELAY, uebergang_kringel_delay);
+void uebergang_kringel_prefs_ausgeben(String& s) {
+  PREF_APPEND(s, PREF_KRINGEL_STEPS, uebergang_kringel_steps);
+  PREF_APPEND(s, PREF_KRINGEL_DELAY, uebergang_kringel_delay);
 }
 
-void uebergang_kringel_prefs_schreiben(Preferences p) {
+void uebergang_kringel_prefs_schreiben(Preferences& p) {
   if (p.getUShort(PREF_KRINGEL_STEPS) != uebergang_kringel_steps) p.putUShort(PREF_KRINGEL_STEPS, uebergang_kringel_steps);
   if (p.getUShort(PREF_KRINGEL_DELAY) != uebergang_kringel_delay) p.putUShort(PREF_KRINGEL_DELAY, uebergang_kringel_delay);
 }
@@ -134,14 +134,14 @@ Uebergang_Kringel::Uebergang_Kringel(int8_t richtung) {
   winkelvorzeichen = richtung;
 }
 
-void Uebergang_Kringel::prefs_laden(Preferences p) {
+void Uebergang_Kringel::prefs_laden(Preferences& p) {
   uebergang_kringel_prefs_laden(p);
 }
 
-void Uebergang_Kringel::prefs_schreiben(Preferences p) {
+void Uebergang_Kringel::prefs_schreiben(Preferences& p) {
   uebergang_kringel_prefs_schreiben(p);
 }
 
-void Uebergang_Kringel::prefs_ausgeben(String& p) {
-  uebergang_kringel_prefs_ausgeben(p);
+void Uebergang_Kringel::prefs_ausgeben(String& s) {
+  uebergang_kringel_prefs_ausgeben(s);
 }

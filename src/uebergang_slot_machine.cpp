@@ -33,7 +33,7 @@ static uint32_t slot_count;
 
 
 
-void uebergang_slot_machine_prefs_laden(Preferences p) {
+void uebergang_slot_machine_prefs_laden(Preferences& p) {
   uebergang_slot_speed_max = p.getFloat(PREF_SLOT_SPEED_MAX, SLOT_SPEED_MAX);
   uebergang_slot_speed_min = p.getFloat(PREF_SLOT_SPEED_MIN, SLOT_SPEED_MIN);
   uebergang_slot_damp_max = p.getFloat(PREF_SLOT_DAMP_MAX, SLOT_DAMP_MAX);
@@ -41,15 +41,15 @@ void uebergang_slot_machine_prefs_laden(Preferences p) {
   uebergang_slot_delay = p.getUShort(PREF_SLOT_DELAY, SLOT_DELAY);
 }
 
-void uebergang_slot_machine_prefs_ausgeben(String& p) {
-  PREF_APPEND(p, PREF_SLOT_SPEED_MAX, uebergang_slot_speed_max);
-  PREF_APPEND(p, PREF_SLOT_SPEED_MIN, uebergang_slot_speed_min);
-  PREF_APPEND(p, PREF_SLOT_DAMP_MAX, uebergang_slot_damp_max);
-  PREF_APPEND(p, PREF_SLOT_DAMP_MIN, uebergang_slot_damp_min);
-  PREF_APPEND(p, PREF_SLOT_DELAY, uebergang_slot_delay);
+void uebergang_slot_machine_prefs_ausgeben(String& s) {
+  PREF_APPEND(s, PREF_SLOT_SPEED_MAX, uebergang_slot_speed_max);
+  PREF_APPEND(s, PREF_SLOT_SPEED_MIN, uebergang_slot_speed_min);
+  PREF_APPEND(s, PREF_SLOT_DAMP_MAX, uebergang_slot_damp_max);
+  PREF_APPEND(s, PREF_SLOT_DAMP_MIN, uebergang_slot_damp_min);
+  PREF_APPEND(s, PREF_SLOT_DELAY, uebergang_slot_delay);
 }
 
-void uebergang_slot_machine_prefs_schreiben(Preferences p) {
+void uebergang_slot_machine_prefs_schreiben(Preferences& p) {
   if (p.getFloat(PREF_SLOT_SPEED_MAX) != uebergang_slot_speed_max) p.putFloat(PREF_SLOT_SPEED_MAX, uebergang_slot_speed_max);
   if (p.getFloat(PREF_SLOT_SPEED_MIN) != uebergang_slot_speed_min) p.putFloat(PREF_SLOT_SPEED_MIN, uebergang_slot_speed_min);
   if (p.getFloat(PREF_SLOT_DAMP_MAX) != uebergang_slot_damp_max) p.putFloat(PREF_SLOT_DAMP_MAX, uebergang_slot_damp_max);
@@ -143,16 +143,16 @@ bool uebergang_slot_machine(struct sKonfiguration *alt, struct sKonfiguration *n
 }
 
 
-void Uebergang_Slot_Machine::prefs_laden(Preferences p) {
+void Uebergang_Slot_Machine::prefs_laden(Preferences& p) {
   uebergang_slot_machine_prefs_laden(p);
 }
 
-void Uebergang_Slot_Machine::prefs_schreiben(Preferences p) {
+void Uebergang_Slot_Machine::prefs_schreiben(Preferences& p) {
   uebergang_slot_machine_prefs_schreiben(p);
 }
 
-void Uebergang_Slot_Machine::prefs_ausgeben(String& p) {
-  uebergang_slot_machine_prefs_ausgeben(p);
+void Uebergang_Slot_Machine::prefs_ausgeben(String& s) {
+  uebergang_slot_machine_prefs_ausgeben(s);
 }
 
 bool Uebergang_Slot_Machine::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

@@ -13,16 +13,16 @@ extern uint16_t uebergang_blend_steps;
 extern uint16_t uebergang_blend_delay;
 
 bool uebergang_blend(struct sKonfiguration *alt, struct sKonfiguration *neu);
-void uebergang_blend_prefs_laden(Preferences p);
+void uebergang_blend_prefs_laden(Preferences& p);
 void uebergang_blend_prefs_ausgeben(String& p);
-void uebergang_blend_prefs_schreiben(Preferences p);
+void uebergang_blend_prefs_schreiben(Preferences& p);
 
 class Uebergang_Blend : public Uebergang {
 public:
 
-  void prefs_laden(Preferences p) override;
-  void prefs_schreiben(Preferences p) override;
-  void prefs_ausgeben(String& p) override;
+  void prefs_laden(Preferences& p) override;
+  void prefs_schreiben(Preferences& p) override;
+  void prefs_ausgeben(String& s) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

@@ -3,7 +3,7 @@
 
 #include "uebergang.h"
 
-void Uebergang::prefs_laden(Preferences p) {}
-void Uebergang::prefs_schreiben(Preferences p) {}
-void Uebergang::prefs_ausgeben(String &) {}
+void Uebergang::prefs_laden(Preferences& p) {}
+void Uebergang::prefs_schreiben(Preferences& p) {}
+void Uebergang::prefs_ausgeben(String& s) {}
 bool Uebergang::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) { return true; }

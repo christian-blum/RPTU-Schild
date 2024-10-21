@@ -8,9 +8,9 @@ bool uebergang_jump(struct sKonfiguration *alteKonfiguration, struct sKonfigurat
 class Uebergang_Jump : public Uebergang {
 public:
 
-  void prefs_laden(Preferences p) override;
-  void prefs_schreiben(Preferences p) override;
-  void prefs_ausgeben(String& p) override;
+  void prefs_laden(Preferences& p) override;
+  void prefs_schreiben(Preferences& p) override;
+  void prefs_ausgeben(String& s) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

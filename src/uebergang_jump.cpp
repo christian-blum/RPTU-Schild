@@ -12,13 +12,13 @@ bool uebergang_jump(struct sKonfiguration *alteKonfiguration, struct sKonfigurat
   return true;
 }
 
-void Uebergang_Jump::prefs_laden(Preferences p) {
+void Uebergang_Jump::prefs_laden(Preferences& p) {
 }
 
-void Uebergang_Jump::prefs_schreiben(Preferences p) {
+void Uebergang_Jump::prefs_schreiben(Preferences& p) {
 }
 
-void Uebergang_Jump::prefs_ausgeben(String& p) {
+void Uebergang_Jump::prefs_ausgeben(String& s) {
 }
 
 bool Uebergang_Jump::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {

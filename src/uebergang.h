@@ -6,9 +6,9 @@
 
 class Uebergang {
 public:
-  virtual void prefs_laden(Preferences p);
-  virtual void prefs_schreiben(Preferences p);
-  virtual void prefs_ausgeben(String & p);
+  virtual void prefs_laden(Preferences& p);
+  virtual void prefs_schreiben(Preferences& p);
+  virtual void prefs_ausgeben(String& s);
   virtual bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu);
 };
 

@@ -18,17 +18,17 @@ uint16_t uebergang_blend_delay;
 #define PREF_BLEND_DELAY "blend_delay"
 
 
-void uebergang_blend_prefs_laden(Preferences p) {
+void uebergang_blend_prefs_laden(Preferences& p) {
   uebergang_blend_steps = p.getUShort(PREF_BLEND_STEPS, BLEND_STEPS);
   uebergang_blend_delay = p.getUShort(PREF_BLEND_DELAY, BLEND_DELAY);
 }
 
-void uebergang_blend_prefs_ausgeben(String& p) {
-  PREF_APPEND(p, PREF_BLEND_STEPS, uebergang_blend_steps);
-  PREF_APPEND(p, PREF_BLEND_DELAY, uebergang_blend_delay);
+void uebergang_blend_prefs_ausgeben(String& s) {
+  PREF_APPEND(s, PREF_BLEND_STEPS, uebergang_blend_steps);
+  PREF_APPEND(s, PREF_BLEND_DELAY, uebergang_blend_delay);
 }
 
-void uebergang_blend_prefs_schreiben(Preferences p) {
+void uebergang_blend_prefs_schreiben(Preferences& p) {
   if (p.getUShort(PREF_BLEND_STEPS) != uebergang_blend_steps) p.putUShort(PREF_BLEND_STEPS, uebergang_blend_steps);
   if (p.getUShort(PREF_BLEND_DELAY) != uebergang_blend_delay) p.putUShort(PREF_BLEND_DELAY, uebergang_blend_delay);
 }
@@ -64,16 +64,16 @@ bool uebergang_blend(struct sKonfiguration *alt, struct sKonfiguration *neu) {
   return false;
 }
 
-void Uebergang_Blend::prefs_laden(Preferences p) {
+void Uebergang_Blend::prefs_laden(Preferences& p) {
   uebergang_blend_prefs_laden(p);
 }
 
-void Uebergang_Blend::prefs_schreiben(Preferences p) {
+void Uebergang_Blend::prefs_schreiben(Preferences& p) {
   uebergang_blend_prefs_schreiben(p);
 }
 
-void Uebergang_Blend::prefs_ausgeben(String& p) {
-  uebergang_blend_prefs_ausgeben(p);
+void Uebergang_Blend::prefs_ausgeben(String& s) {
+  uebergang_blend_prefs_ausgeben(s);
 }
 
 bool Uebergang_Blend::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
