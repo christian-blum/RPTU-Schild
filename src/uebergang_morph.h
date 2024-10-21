@@ -17,16 +17,10 @@ void uebergang_morph_prefs_laden(Preferences& p);
 void uebergang_morph_prefs_ausgeben(String& p);
 void uebergang_morph_prefs_schreiben(Preferences& p);
 
-class Uebergang_Morph : public Uebergang {
+class Uebergang_Morph : public Uebergang_sd {
 public:
   Uebergang_Morph(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
 
-  uint16_t default_steps;
-  uint16_t steps;
-  uint16_t default_delay;
-  uint16_t delay;
-
-  void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;
   void prefs_ausgeben(String& s) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;

@@ -59,19 +59,13 @@ bool uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu) {
 
 
 
-Uebergang_Morph::Uebergang_Morph(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang(aktiv, gewichtung) {
-  Uebergang_Morph::steps = default_steps = steps;
-  Uebergang_Morph::delay = default_delay = delay;
+Uebergang_Morph::Uebergang_Morph(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang_sd(aktiv, gewichtung, steps, delay) {
   name = (char *)"Morph";
   beschreibung = (char *)"Buchstaben bewegen sich in ihre neue Position, dabei ändern sich Farben kontinuierlich.";
   tag = (char *)"morph";
 }
 
 
-
-void Uebergang_Morph::prefs_laden(Preferences& p) {
-  uebergang_morph_prefs_laden(p);
-}
 
 void Uebergang_Morph::prefs_schreiben(Preferences& p) {
   uebergang_morph_prefs_schreiben(p);

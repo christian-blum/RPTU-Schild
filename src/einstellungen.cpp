@@ -59,7 +59,6 @@ void preferences_laden() {
     helligkeit = p.getUChar(PREF_HELLIGKEIT, HELLIGKEIT_DEFAULT);
     effekte_einaus = p.getBool(PREF_EFFEKTE, true);
     hintergrund_schwarz = p.getBool(PREF_HG_SCHWARZ, false);
-    uebergaenge_prefs_laden(p);
     effekt_pause_max = p.getULong(PREF_EFFEKT_PAUSE_MAX, EFFEKT_PAUSE_MAX);
     effekt_pause_min = p.getULong(PREF_EFFEKT_PAUSE_MIN, EFFEKT_PAUSE_MIN);
     laufschrift_delay = p.getUShort(PREF_LAUFSCHRIFT_DELAY, LAUFSCHRIFT_DELAY);
@@ -73,6 +72,7 @@ void preferences_laden() {
     Serial.println("Kann NVS namespace " PREF_NAMESPACE_ALLGEMEIN " nicht lesen.");
   }
   p.end();
+  uebergaenge_prefs_laden();
   preferences_ausgeben();
 }
 
@@ -84,7 +84,6 @@ void preferences_schreiben() {
     if (p.getUChar(PREF_HELLIGKEIT) != helligkeit) p.putUChar(PREF_HELLIGKEIT, helligkeit);
     if (p.getBool(PREF_EFFEKTE) != effekte_einaus) p.putBool(PREF_EFFEKTE, effekte_einaus);
     if (p.getBool(PREF_HG_SCHWARZ) != hintergrund_schwarz) p.putBool(PREF_HG_SCHWARZ, hintergrund_schwarz);
-    uebergaenge_prefs_schreiben(p);
     if (p.getULong(PREF_EFFEKT_PAUSE_MAX) != effekt_pause_max) p.putULong(PREF_EFFEKT_PAUSE_MAX, effekt_pause_max);
     if (p.getULong(PREF_EFFEKT_PAUSE_MIN) != effekt_pause_min) p.putULong(PREF_EFFEKT_PAUSE_MIN, effekt_pause_min);
     if (p.getUShort(PREF_LAUFSCHRIFT_DELAY) != laufschrift_delay) p.putUShort(PREF_LAUFSCHRIFT_DELAY, laufschrift_delay);
@@ -98,6 +97,7 @@ void preferences_schreiben() {
     Serial.println("Kann NVS namespace " PREF_NAMESPACE_ALLGEMEIN " nicht schreiben.");
   }
   p.end();
+  uebergaenge_prefs_schreiben();
 }
 
 

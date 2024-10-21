@@ -5,34 +5,32 @@
 #include <Preferences.h>
 #include "uebergang.h"
 
-#define KRINGEL_STEPS 90
-#define KRINGEL_DELAY 40
 
-extern uint16_t uebergang_kringel_steps;
-extern uint16_t uebergang_kringel_delay;
+struct sKringelPol {
+  float winkel;
+  float radius;
+};
 
-bool uebergang_kringel(struct sKonfiguration *alt, struct sKonfiguration *neu, int8_t winkelvorzeichen);
-bool uebergang_kringel_rechtsrum(struct sKonfiguration *alt, struct sKonfiguration *neu);
-bool uebergang_kringel_linksrum(struct sKonfiguration *alt, struct sKonfiguration *neu);
-void uebergang_kringel_prefs_laden(Preferences& p);
-void uebergang_kringel_prefs_ausgeben(String& p);
-void uebergang_kringel_prefs_schreiben(Preferences& p);
+struct sKringelSZ {
+  struct sKringelPol start;
+  struct sKringelPol ziel;
+};
 
-class Uebergang_Kringel : public Uebergang {
+
+
+class Uebergang_Kringel : public Uebergang_sd {
 private:
+  uint16_t kringel_step;
+  struct sKringelSZ kpr;
+  struct sKringelSZ kpp;
+  struct sKringelSZ kpt;
+  struct sKringelSZ kpu;
+
 
 public:
   Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay, int8_t richtung); // +1 oder -1
-
-  uint16_t default_steps;
-  uint16_t steps;
-  uint16_t default_delay;
-  uint16_t delay;
   int8_t richtung;
 
-  void prefs_laden(Preferences& p) override;
-  void prefs_schreiben(Preferences& p) override;
-  void prefs_ausgeben(String& s) override;
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

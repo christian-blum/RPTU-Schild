@@ -215,9 +215,10 @@ void wifi_loop() {
       wifi_loop_state = WIFI_LOOP_STATE_CONNECTION_ESTABLISHED;
     }
     else {
-      if (wifi_initialization_time >= WIFI_CONNECTION_TIMEOUT) {
+      unsigned long m = millis();
+      if (m - wifi_initialization_time >= WIFI_CONNECTION_TIMEOUT) {
         Serial.println("WLAN connection not working, keep trying.");
-        wifi_initialization_time = millis();
+        wifi_initialization_time = m;
       }
     }
     break;

@@ -5,29 +5,17 @@
 #include <Preferences.h>
 #include "uebergang.h"
 
-#define BLEND_STEPS 20
-#define BLEND_DELAY 50
 
-extern uint16_t uebergang_blend_steps;
-extern uint16_t uebergang_blend_delay;
+class Uebergang_Blend : public Uebergang_sd {
+private:
+  int blend_step;
+  struct sCRGBA *aBitmap;
+  struct sCRGBA *nBitmap;
 
-bool uebergang_blend(struct sKonfiguration *alt, struct sKonfiguration *neu);
-void uebergang_blend_prefs_laden(Preferences& p);
-void uebergang_blend_prefs_ausgeben(String& p);
-void uebergang_blend_prefs_schreiben(Preferences& p);
-
-class Uebergang_Blend : public Uebergang {
 public:
   Uebergang_Blend(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
-
-  uint16_t default_steps;
-  uint16_t steps;
-  uint16_t default_delay;
-  uint16_t delay;
-
-  void prefs_laden(Preferences& p) override;
-  void prefs_schreiben(Preferences& p) override;
-  void prefs_ausgeben(String& s) override;
+ ~Uebergang_Blend();
+ 
   bool doit(struct sKonfiguration *alt, struct sKonfiguration *neu) override;
 };
 

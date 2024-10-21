@@ -5,26 +5,36 @@
 #include <Preferences.h>
 #include "uebergang.h"
 
-#define SLOT_SPEED_MAX 6.0f
-#define SLOT_SPEED_MIN 0.2f
-#define SLOT_DAMP_MAX 0.03f
-#define SLOT_DAMP_MIN 0.02f
-#define SLOT_DELAY 50
+#define PREF_SPEED_MIN "speed_min"
+#define PREF_SPEED_MAX "speed_max"
+#define PREF_DAMP_MIN "damp_min"
+#define PREF_DAMP_MAX "damp_max"
 
-extern float uebergang_slot_speed_max;
-extern float uebergang_slot_speed_min;
-extern float uebergang_slot_damp_max;
-extern float uebergang_slot_damp_min;
-extern uint16_t uebergang_slot_delay;
+class Uebergang_Slot_Machine : public Uebergang_sd {
+private:
+  uint8_t slot_woWirSind;
+  float slot_positions[4];
+  float slot_speeds[4];
+  float slot_dampening[4];
+  struct sKonfiguration * slot_letzteKonfiguration;
+  uint32_t slot_gesamt;
+  uint32_t slot_count;
+  uint8_t morph_step;
 
-bool uebergang_slot_machine(struct sKonfiguration *alt, struct sKonfiguration *neu);
-void uebergang_slot_machine_prefs_laden(Preferences& p);
-void uebergang_slot_machine_prefs_ausgeben(String& s);
-void uebergang_slot_machine_prefs_schreiben(Preferences& p);
+  bool uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu, uint16_t morph_steps, uint16_t morph_delay, uint16_t morph_delay_ende);
 
-class Uebergang_Slot_Machine : public Uebergang {
 public:
-  Uebergang_Slot_Machine(bool aktiv, uint16_t gewichtung);
+  Uebergang_Slot_Machine(bool aktiv, uint16_t gewichtung, uint16_t delay, float speed_min, float speed_max, float damp_min, float damp_max);
+ ~Uebergang_Slot_Machine();
+ 
+  float default_speed_min;
+  float speed_min;
+  float default_speed_max;
+  float speed_max;
+  float default_damp_min;
+  float damp_min;
+  float default_damp_max;
+  float damp_max;
 
   void prefs_laden(Preferences& p) override;
   void prefs_schreiben(Preferences& p) override;

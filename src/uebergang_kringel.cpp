@@ -10,37 +10,6 @@
 #include "uebergaenge.h"
 
 
-uint16_t uebergang_kringel_steps;
-uint16_t uebergang_kringel_delay;
-
-#define PREF_KRINGEL_STEPS "kringel_steps"
-#define PREF_KRINGEL_DELAY "kringel_delay"
-
-
-void uebergang_kringel_prefs_laden(Preferences& p) {
-  uebergang_kringel_steps = p.getUShort(PREF_KRINGEL_STEPS, KRINGEL_STEPS);
-  uebergang_kringel_delay = p.getUShort(PREF_KRINGEL_DELAY, KRINGEL_DELAY);
-}
-
-void uebergang_kringel_prefs_ausgeben(String& s) {
-  PREF_APPEND(s, PREF_KRINGEL_STEPS, uebergang_kringel_steps);
-  PREF_APPEND(s, PREF_KRINGEL_DELAY, uebergang_kringel_delay);
-}
-
-void uebergang_kringel_prefs_schreiben(Preferences& p) {
-  if (p.getUShort(PREF_KRINGEL_STEPS) != uebergang_kringel_steps) p.putUShort(PREF_KRINGEL_STEPS, uebergang_kringel_steps);
-  if (p.getUShort(PREF_KRINGEL_DELAY) != uebergang_kringel_delay) p.putUShort(PREF_KRINGEL_DELAY, uebergang_kringel_delay);
-}
-
-struct sKringelPol {
-  float winkel;
-  float radius;
-};
-
-struct sKringelSZ {
-  struct sKringelPol start;
-  struct sKringelPol ziel;
-};
 
 #define MITTELPUNKT_X ((float)(LED_COUNT_X-1) / 2.0)
 #define MITTELPUNKT_Y ((float)(LED_COUNT_Y-1) / 2.0)
@@ -82,61 +51,12 @@ static struct sKringelSZ uebergang_kringel_berechneStartZiel(struct sPosition al
   return s;
 }
 
-
-static uint16_t kringel_step;
-static struct sKringelSZ kpr;
-static struct sKringelSZ kpp;
-static struct sKringelSZ kpt;
-static struct sKringelSZ kpu;
-
-/*
-static void printIt(struct sPosition k, sKringelPol p) {
-    struct sPosition a = uebergang_kringel_kartesischAusPolar(p);
-}
-*/
-
-bool uebergang_kringel(struct sKonfiguration *alt, struct sKonfiguration *neu, int8_t winkelvorzeichen) {
-  if (kringel_step == 0) {
-    kpr = uebergang_kringel_berechneStartZiel(alt->r, neu->r, winkelvorzeichen);
-    kpp = uebergang_kringel_berechneStartZiel(alt->p, neu->p, winkelvorzeichen);
-    kpt = uebergang_kringel_berechneStartZiel(alt->t, neu->t, winkelvorzeichen);
-    kpu = uebergang_kringel_berechneStartZiel(alt->u, neu->u, winkelvorzeichen);
-  }
-  float step = (float)kringel_step / uebergang_kringel_steps;
-  struct sKonfiguration x;
-  x.r = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpr, step, winkelvorzeichen));
-  x.p = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpp, step, winkelvorzeichen));
-  x.t = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpt, step, winkelvorzeichen));
-  x.u = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpu, step, winkelvorzeichen));
-  x.schriftfarbe = morph_color(alt->schriftfarbe, neu->schriftfarbe, kringel_step, uebergang_kringel_steps);
-  x.hintergrundfarbe = morph_color(alt->hintergrundfarbe, neu->hintergrundfarbe, kringel_step, uebergang_kringel_steps);
-
-  kringel_step++;
-  uebergang_queueKonfiguration(&x, (kringel_step == uebergang_kringel_steps + 1) ? konfiguration_pause : uebergang_kringel_delay);
-  
-  if (kringel_step >= uebergang_kringel_steps + 1) {
-    kringel_step = 0;
-    return true;
-  }
-  return false;
-}
-
-
-bool uebergang_kringel_rechtsrum(struct sKonfiguration *alt, struct sKonfiguration *neu) {
-  return uebergang_kringel(alt, neu, +1);
-}
-
-bool uebergang_kringel_linksrum(struct sKonfiguration *alt, struct sKonfiguration *neu) {
-  return uebergang_kringel(alt, neu, -1);
-}
-
-Uebergang_Kringel::Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay, int8_t richtung) : Uebergang(aktiv, gewichtung) {
-  Uebergang_Kringel::steps = default_steps = steps;
-  Uebergang_Kringel::delay = default_delay = delay;
+Uebergang_Kringel::Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay, int8_t richtung) : Uebergang_sd(aktiv, gewichtung, steps, delay) {
   Uebergang_Kringel::richtung = richtung;
   name = (char *)"Kringel";
   beschreibung = (char *)"Buchstaben rotieren mit unterschiedlicher Geschwindigkeit und wechseln dabei gegebenenfalls nach und nach die Umlaufbahn. Rechtsrum oder linksrum.";
   tag = (char *)"kringel";
+  kringel_step = 0;
 }
 
 Uebergang_Kringel_linksrum::Uebergang_Kringel_linksrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang_Kringel(aktiv, gewichtung, steps, delay, -1) {
@@ -149,18 +69,28 @@ Uebergang_Kringel_rechtsrum::Uebergang_Kringel_rechtsrum(bool aktiv, uint16_t ge
   tag = (char *)"kringel_r";
 }
 
-void Uebergang_Kringel::prefs_laden(Preferences& p) {
-  uebergang_kringel_prefs_laden(p);
-}
-
-void Uebergang_Kringel::prefs_schreiben(Preferences& p) {
-  uebergang_kringel_prefs_schreiben(p);
-}
-
-void Uebergang_Kringel::prefs_ausgeben(String& s) {
-  uebergang_kringel_prefs_ausgeben(s);
-}
-
 bool Uebergang_Kringel::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
-  return uebergang_kringel(alt, neu, richtung);
+  if (kringel_step == 0) {
+    kpr = uebergang_kringel_berechneStartZiel(alt->r, neu->r, richtung);
+    kpp = uebergang_kringel_berechneStartZiel(alt->p, neu->p, richtung);
+    kpt = uebergang_kringel_berechneStartZiel(alt->t, neu->t, richtung);
+    kpu = uebergang_kringel_berechneStartZiel(alt->u, neu->u, richtung);
+  }
+  float step = (float)kringel_step / steps;
+  struct sKonfiguration x;
+  x.r = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpr, step, richtung));
+  x.p = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpp, step, richtung));
+  x.t = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpt, step, richtung));
+  x.u = uebergang_kringel_kartesischAusPolar(uebergang_kringel_polarinterpolation(kpu, step, richtung));
+  x.schriftfarbe = morph_color(alt->schriftfarbe, neu->schriftfarbe, kringel_step, steps);
+  x.hintergrundfarbe = morph_color(alt->hintergrundfarbe, neu->hintergrundfarbe, kringel_step, steps);
+
+  kringel_step++;
+  uebergang_queueKonfiguration(&x, (kringel_step == steps + 1) ? konfiguration_pause : delay);
+  
+  if (kringel_step >= steps + 1) {
+    kringel_step = 0;
+    return true;
+  }
+  return false;
 }
