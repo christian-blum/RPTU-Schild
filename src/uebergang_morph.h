@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include "uebergang.h"
 
 #define MORPH_STEPS 40
 #define MORPH_DELAY 50
@@ -19,10 +20,6 @@ void uebergang_morph_prefs_schreiben(Preferences& p);
 class Uebergang_Morph : public Uebergang {
 public:
   Uebergang_Morph(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay);
-
-  const char* name = "Morph";
-  const char* beschreibung = "Buchstaben bewegen sich in ihre neue Position, dabei ändern sich Farben kontinuierlich.";
-  const char* tag = "morph";
 
   uint16_t default_steps;
   uint16_t steps;

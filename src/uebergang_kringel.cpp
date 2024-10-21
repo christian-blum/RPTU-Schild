@@ -134,12 +134,19 @@ Uebergang_Kringel::Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t s
   Uebergang_Kringel::steps = default_steps = steps;
   Uebergang_Kringel::delay = default_delay = delay;
   Uebergang_Kringel::richtung = richtung;
+  name = (char *)"Kringel";
+  beschreibung = (char *)"Buchstaben rotieren mit unterschiedlicher Geschwindigkeit und wechseln dabei gegebenenfalls nach und nach die Umlaufbahn. Rechtsrum oder linksrum.";
+  tag = (char *)"kringel";
 }
 
 Uebergang_Kringel_linksrum::Uebergang_Kringel_linksrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang_Kringel(aktiv, gewichtung, steps, delay, -1) {
+  name = (char *)"Kringel linksrum";
+  tag = (char *)"kringel_l";
 }
 
 Uebergang_Kringel_rechtsrum::Uebergang_Kringel_rechtsrum(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang_Kringel(aktiv, gewichtung, steps, delay, +1) {
+  name = (char *)"Kringel rechtsrum";
+  tag = (char *)"kringel_r";
 }
 
 void Uebergang_Kringel::prefs_laden(Preferences& p) {
@@ -152,4 +159,8 @@ void Uebergang_Kringel::prefs_schreiben(Preferences& p) {
 
 void Uebergang_Kringel::prefs_ausgeben(String& s) {
   uebergang_kringel_prefs_ausgeben(s);
+}
+
+bool Uebergang_Kringel::doit(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+  return uebergang_kringel(alt, neu, richtung);
 }

@@ -143,6 +143,12 @@ bool uebergang_slot_machine(struct sKonfiguration *alt, struct sKonfiguration *n
 }
 
 
+Uebergang_Slot_Machine::Uebergang_Slot_Machine(bool aktiv, uint16_t gewichtung) : Uebergang(aktiv, gewichtung) {
+  name = (char *)"Slot Machine";
+  beschreibung = (char *)"Willkommen in Las Vegas, nur ohne Münzschlitz!";
+  tag = (char *)"sm";
+}
+
 void Uebergang_Slot_Machine::prefs_laden(Preferences& p) {
   uebergang_slot_machine_prefs_laden(p);
 }

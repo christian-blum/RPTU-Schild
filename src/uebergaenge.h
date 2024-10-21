@@ -15,7 +15,7 @@ void uebergaenge_prefs_ausgeben(String& s);
 void uebergaenge_laden();
 void uebergaenge_speichern();
 void setup_uebergaenge();
-bool (*wuerfele_uebergang())(struct sKonfiguration *alt, struct sKonfiguration *neu);
+bool (*wuerfele_uebergang_alt())(struct sKonfiguration *alt, struct sKonfiguration *neu);
 void base_pipeline_fuellen();
 
 #endif

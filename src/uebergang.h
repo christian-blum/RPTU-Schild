@@ -1,6 +1,7 @@
 #ifndef __UEBERGANG_H
 #define __UEBERGANG_H
 
+#include <Arduino.h>
 #include <Preferences.h>
 #include "konfiguration.h"
 
@@ -8,9 +9,9 @@ class Uebergang {
 public:
   Uebergang(bool aktiv, uint16_t gewichtung);
 
-  const char* name;
-  const char* beschreibung;
-  const char* tag;
+  char* name = (char *)"parent";
+  char* beschreibung = (char *)"parent";
+  char* tag = (char *)"parent";
   bool default_aktiv;
   bool aktiv;
   uint16_t default_gewichtung;

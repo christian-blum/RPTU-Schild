@@ -68,6 +68,9 @@ bool uebergang_blend(struct sKonfiguration *alt, struct sKonfiguration *neu) {
 Uebergang_Blend::Uebergang_Blend(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang(aktiv, gewichtung) {
   Uebergang_Blend::steps = default_steps = steps;
   Uebergang_Blend::delay = default_delay = delay;
+  name = (char *)"Blend";
+  beschreibung = (char *)"Weiche Überblende von einem zum anderen Zustand.";
+  tag = (char *)"blend";
 }
 
 void Uebergang_Blend::prefs_laden(Preferences& p) {

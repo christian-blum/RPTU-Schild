@@ -64,6 +64,9 @@ bool uebergang_bigbang(struct sKonfiguration *alt, struct sKonfiguration *neu) {
 Uebergang_Big_Bang::Uebergang_Big_Bang(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay) : Uebergang(aktiv, gewichtung) {
   Uebergang_Big_Bang::steps = default_steps = steps;
   Uebergang_Big_Bang::delay = default_delay = delay;
+  name = (char *)"Big Bang";
+  beschreibung = (char *)"Buchstaben kollabieren im Gravitationszentrum und explodieren von dort in eine neue Position, wie Materie in einem oszillierenden Universum.";
+  tag = (char *)"big_bang";
 }
 
 void Uebergang_Big_Bang::prefs_laden(Preferences& p) {

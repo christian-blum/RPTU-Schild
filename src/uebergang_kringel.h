@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
-
 #include "uebergang.h"
 
 #define KRINGEL_STEPS 90
@@ -24,10 +23,6 @@ private:
 
 public:
   Uebergang_Kringel(bool aktiv, uint16_t gewichtung, uint16_t steps, uint16_t delay, int8_t richtung); // +1 oder -1
-
-  const char* name = "Kringel";
-  const char* beschreibung = "Buchstaben rotieren mit unterschiedlicher Geschwindigkeit und wechseln dabei gegebenenfalls nach und nach die Umlaufbahn. Rechtsrum oder linksrum.";
-  const char* tag = "kringel";
 
   uint16_t default_steps;
   uint16_t steps;

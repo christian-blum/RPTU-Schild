@@ -39,7 +39,7 @@ struct sCRGBA morph_color(struct sCRGBA alt, struct sCRGBA neu, uint32_t i, uint
 
 static struct sKonfiguration letzte_konfiguration;  // Kopie (!!) der letzten Konfiguration - weil sie im Hintergrund auf dem Heap vernichtet wird.
 static struct sKonfiguration aktuelle_zielkonfiguration;
-static bool (*laufender_uebergang)(struct sKonfiguration *alt, struct sKonfiguration *neu);
+static bool (*laufender_uebergang_alt)(struct sKonfiguration *alt, struct sKonfiguration *neu);
 
 
 struct sUebergangDef {
@@ -67,19 +67,21 @@ static const struct sUebergangDef uebergaenge_defaults[] = {
   "Epillepsie",     true,   20, uebergang_epilleptischer_anfall,
 };
 
-#define UEBERGAENGE_ANZAHL (sizeof(uebergaenge_defaults) / sizeof(uebergaenge_defaults[0]))
+#define UEBERGAENGE_ANZAHL_ALT (sizeof(uebergaenge_defaults) / sizeof(uebergaenge_defaults[0]))
 
-static struct sUebergang uebergaenge_alt[UEBERGAENGE_ANZAHL];
+static struct sUebergang uebergaenge_alt[UEBERGAENGE_ANZAHL_ALT];
 static uint32_t uebergaenge_summe_gewichte;
 
+#if 0
 static void uebergaenge_gewichtungen_summieren() {
   uebergaenge_summe_gewichte = 0;
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
+  for (int i = 0; i < UEBERGAENGE_ANZAHL_ALT; i++) {
     struct sUebergang *u;
     u = &uebergaenge_alt[i];
     if (u->aktiv) uebergaenge_summe_gewichte += u->gewichtung;
   }
 }
+#endif
 
 #define UEBERGAENGE_DELIMITER ";"
 
@@ -125,7 +127,7 @@ void uebergaenge_prefs_ausgeben(String& s) {
 void uebergaenge_laden() {
   Preferences p;
   p.begin("uebergaenge", true);
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
+  for (int i = 0; i < UEBERGAENGE_ANZAHL_ALT; i++) {
     const struct sUebergangDef *d = &uebergaenge_defaults[i];
     struct sUebergang *u = &uebergaenge_alt[i];
     u->aktiv = d->gewichtung;
@@ -159,13 +161,13 @@ void uebergaenge_laden() {
 #endif
   }
   p.end();
-  uebergaenge_gewichtungen_summieren();
+//fixme  uebergaenge_gewichtungen_summieren();
 }
 
 void uebergaenge_speichern() {
   Preferences p;
   p.begin("uebergaenge", false);
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
+  for (int i = 0; i < UEBERGAENGE_ANZAHL_ALT; i++) {
     const struct sUebergangDef *d = &uebergaenge_defaults[i];
     const struct sUebergang *u = &uebergaenge_alt[i];
     String x = String(u->aktiv ? "1;":"0;");
@@ -177,43 +179,40 @@ void uebergaenge_speichern() {
 
 
 
-void setup_uebergaenge() {
-  uebergaenge_laden();
-  letzte_konfiguration = konfiguration_wuerfeln();
-}
 
 
+#if 0
 // nicht erschrecken. :-) Wir definieren eine Funktion, die keine Parameter hat und als Rückgabewert einen Pointer auf eine Funktion mit zwei Argumenten hat. C ist fast so cool wie Brainfuck.
-bool (*wuerfele_uebergang())(struct sKonfiguration *alt, struct sKonfiguration *neu) {
+bool (*wuerfele_uebergang_alt())(struct sKonfiguration *alt, struct sKonfiguration *neu) {
   if (uebergaenge_summe_gewichte == 0) return NULL; // da ist nichts zu wollen
   int32_t x = random(uebergaenge_summe_gewichte);
   struct sUebergang *u;
-  for (int i = 0; i < UEBERGAENGE_ANZAHL && x >= 0; i++) {
+  for (int i = 0; i < UEBERGAENGE_ANZAHL_ALT && x >= 0; i++) {
     u = &uebergaenge_alt[i];
     if (!u->aktiv) continue;
     x -= u->gewichtung;
   }
   return u ? u->funktion : NULL;
 }
+#endif
 
-
-
-void base_pipeline_fuellen() {
+#if 0
+void base_pipeline_fuellen_alt() {
   //  if (!einaus) return;  // Wenn das Schild gerade nicht an ist, brauchen auch keine Konfigurationen erzeugt zu werden.
   if (base_pipeline_laenge >= UEBERGAENGE_PIPELINE_MINDESTLAENGE) return;  // wir haben genug auf Halde.
-  if (laufender_uebergang == NULL) {
-    laufender_uebergang = wuerfele_uebergang();
+  if (laufender_uebergang_alt == NULL) {
+    laufender_uebergang_alt = wuerfele_uebergang_alt();
     aktuelle_zielkonfiguration = konfiguration_wuerfeln();
   }
-  while (base_pipeline_laenge < UEBERGAENGE_PIPELINE_MAXIMALLAENGE && laufender_uebergang != NULL) {
-    bool abgeschlossen = (*laufender_uebergang)(&letzte_konfiguration, &aktuelle_zielkonfiguration); // dann rufen wir die Funktion mal auf...
+  while (base_pipeline_laenge < UEBERGAENGE_PIPELINE_MAXIMALLAENGE && laufender_uebergang_alt != NULL) {
+    bool abgeschlossen = (*laufender_uebergang_alt)(&letzte_konfiguration, &aktuelle_zielkonfiguration); // dann rufen wir die Funktion mal auf...
     if (abgeschlossen) {
       letzte_konfiguration = aktuelle_zielkonfiguration;
-      laufender_uebergang = NULL;
+      laufender_uebergang_alt = NULL;
     }
   }
 }
-
+#endif
 
 
 
@@ -224,13 +223,75 @@ void base_pipeline_fuellen() {
 /***************************************************************/
 
 /* Hier wird festgelegt, welche Übergänge es gibt. Die Parameter sind nur Defaults. */
-Uebergang uebergaenge[] = {
-  Uebergang_Jump(true, 100),
-  Uebergang_Morph(true, 100, 40, 50),
-  Uebergang_Blend(true, 100, 20, 50),
-  Uebergang_Slot_Machine(true, 150),
-  Uebergang_Big_Bang(true, 150, 40, 50),
-  Uebergang_Kringel_linksrum(true, 75, 90, 40),
-  Uebergang_Kringel_rechtsrum(true, 75, 90, 40),
-  Uebergang_Epilleptischer_Anfall(true, 20, 30, 110),
+
+Uebergang_Jump x_uebergang_jump(true, 100);
+Uebergang_Morph x_uebergang_morph(true, 100, 40, 50);
+Uebergang_Blend x_uebergang_blend(true, 100, 20, 50);
+Uebergang_Slot_Machine x_uebergang_slot_machine(true, 150);
+Uebergang_Big_Bang x_uebergang_big_bang(true, 150, 40, 50);
+Uebergang_Kringel_linksrum x_uebergang_kringel_linksrum(true, 75, 90, 40);
+Uebergang_Kringel_rechtsrum x_uebergang_kringel_rechtsrum(true, 75, 90, 40);
+Uebergang_Epilleptischer_Anfall x_uebergang_epilleptischer_anfall(true, 20, 30, 110);
+
+Uebergang *uebergaenge[] = {
+  &x_uebergang_jump,
+  &x_uebergang_morph,
+  &x_uebergang_blend,
+  &x_uebergang_slot_machine,
+  &x_uebergang_big_bang,
+  &x_uebergang_kringel_linksrum,
+  &x_uebergang_kringel_rechtsrum,
+  &x_uebergang_epilleptischer_anfall,
 };
+#define UEBERGAENGE_ANZAHL (sizeof(uebergaenge)/sizeof(uebergaenge[0]))
+
+
+Uebergang *laufender_uebergang;
+
+
+
+
+Uebergang *wuerfele_uebergang() {
+  if (uebergaenge_summe_gewichte == 0) return nullptr; // da ist nichts zu wollen
+  int32_t x = random(uebergaenge_summe_gewichte);
+  Uebergang *u = nullptr;
+  for (int i = 0; i < UEBERGAENGE_ANZAHL && x >= 0; i++) {
+    u = uebergaenge[i];
+    if (!u->aktiv) continue;
+    x -= u->gewichtung;
+  }
+  return u;
+}
+
+#include "uebergang_jump.h"
+
+void base_pipeline_fuellen() {
+  //  if (!einaus) return;  // Wenn das Schild gerade nicht an ist, brauchen auch keine Konfigurationen erzeugt zu werden.
+  if (base_pipeline_laenge >= UEBERGAENGE_PIPELINE_MINDESTLAENGE) return;  // wir haben genug auf Halde.
+  if (!laufender_uebergang) {
+    laufender_uebergang = wuerfele_uebergang();
+    aktuelle_zielkonfiguration = konfiguration_wuerfeln();
+  }
+  while (laufender_uebergang != nullptr && base_pipeline_laenge < UEBERGAENGE_PIPELINE_MAXIMALLAENGE) {
+    bool abgeschlossen = laufender_uebergang->doit(&letzte_konfiguration, &aktuelle_zielkonfiguration); // dann rufen wir die Funktion mal auf...
+    if (abgeschlossen) {
+      letzte_konfiguration = aktuelle_zielkonfiguration;
+      laufender_uebergang = nullptr;
+    }
+  }
+}
+
+static void uebergaenge_gewichtungen_summieren() {
+  uebergaenge_summe_gewichte = 0;
+  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
+    Uebergang *u;
+    u = uebergaenge[i];
+    if (u->aktiv) uebergaenge_summe_gewichte += u->gewichtung;
+  }
+}
+
+void setup_uebergaenge() {
+  //uebergaenge_laden();
+  uebergaenge_gewichtungen_summieren();
+  letzte_konfiguration = konfiguration_wuerfeln();
+}
