@@ -13,7 +13,7 @@ Uebergang::~Uebergang() {}
 
 void Uebergang::prefs_laden(Preferences& p) {
   aktiv = p.getBool(PREF_AKTIV, aktiv);
-  gewichtung = p.getBool(PREF_GEWICHTUNG, gewichtung);
+  gewichtung = p.getUShort(PREF_GEWICHTUNG, gewichtung);
 }
 
 void Uebergang::prefs_laden() {

@@ -14,6 +14,27 @@ Uebergang_Big_Bang::Uebergang_Big_Bang(bool aktiv, uint16_t gewichtung, uint16_t
   beschreibung = (char *)"Buchstaben kollabieren im Gravitationszentrum und explodieren von dort in eine neue Position, wie Materie in einem oszillierenden Universum.";
   tag = (char *)"big_bang";
   bigbang_phase = 0;
+  morph_step = 0;
+}
+
+
+bool Uebergang_Big_Bang::uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu, uint16_t steps, uint16_t delay, uint16_t delay_end) {
+  struct sKonfiguration x;
+  x.r = morph_position(alt->r, neu->r, morph_step, steps);
+  x.p = morph_position(alt->p, neu->p, morph_step, steps);
+  x.t = morph_position(alt->t, neu->t, morph_step, steps);
+  x.u = morph_position(alt->u, neu->u, morph_step, steps);
+  x.schriftfarbe = morph_color(alt->schriftfarbe, neu->schriftfarbe, morph_step, steps);
+  x.hintergrundfarbe = morph_color(alt->hintergrundfarbe, neu->hintergrundfarbe, morph_step, steps);
+
+  morph_step++;
+  uebergang_queueKonfiguration(&x, ((morph_step >= steps + 1) && (steps>3)) ? konfiguration_pause : delay);
+  
+  if (morph_step >= steps + 1) {
+    morph_step = 0;
+    return true;
+  }
+  return false;
 }
 
 
@@ -31,11 +52,11 @@ bool Uebergang_Big_Bang::doit(struct sKonfiguration *alt, struct sKonfiguration 
     bigbang_phase = 1;
     return false;
   case 1:
-    fertig = uebergang_morph(alt, &bigbang_mitte, steps/2, delay, delay);
+    fertig = Uebergang_Big_Bang::uebergang_morph(alt, &bigbang_mitte, steps/2, delay, delay);
     if (fertig) bigbang_phase = 2;
     return false;
   case 2:
-    fertig = uebergang_morph(&bigbang_mitte, neu, steps/2, delay, konfiguration_pause);
+    fertig = Uebergang_Big_Bang::uebergang_morph(&bigbang_mitte, neu, steps/2, delay, konfiguration_pause);
     if (fertig) bigbang_phase = 3;
     return false;
   default:
