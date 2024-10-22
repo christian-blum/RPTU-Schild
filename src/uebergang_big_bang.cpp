@@ -28,7 +28,7 @@ bool Uebergang_Big_Bang::uebergang_morph(struct sKonfiguration *alt, struct sKon
   x.hintergrundfarbe = morph_color(alt->hintergrundfarbe, neu->hintergrundfarbe, morph_step, steps);
 
   morph_step++;
-  uebergang_queueKonfiguration(&x, ((morph_step >= steps + 1) && (steps>3)) ? konfiguration_pause : delay);
+  uebergang_queueKonfiguration(&x, ((morph_step >= steps + 1) && (steps>3)) ? delay_end : delay);
   
   if (morph_step >= steps + 1) {
     morph_step = 0;
