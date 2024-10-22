@@ -57,13 +57,12 @@ Uebergang_Jump x_uebergang_jump(true, 100);
 Uebergang_Morph x_uebergang_morph(true, 100, 40, 50);
 Uebergang_Blend x_uebergang_blend(true, 100, 20, 50);
 Uebergang_Slot_Machine x_uebergang_slot_machine(true, 150, 50, 0.2f, 6.0f, 0.02f, 0.03f);
-
 Uebergang_Big_Bang x_uebergang_big_bang(true, 150, 40, 50);
 Uebergang_Kringel_linksrum x_uebergang_kringel_linksrum(true, 75, 90, 40);
 Uebergang_Kringel_rechtsrum x_uebergang_kringel_rechtsrum(true, 75, 90, 40);
 Uebergang_Epilleptischer_Anfall x_uebergang_epilleptischer_anfall(true, 20, 30, 110);
 
-Uebergang *uebergaenge[] = {
+std::array<Uebergang *, 8> uebergaenge = {
   &x_uebergang_jump,
   &x_uebergang_morph,
   &x_uebergang_blend,
@@ -73,27 +72,27 @@ Uebergang *uebergaenge[] = {
   &x_uebergang_kringel_rechtsrum,
   &x_uebergang_epilleptischer_anfall,
 };
-#define UEBERGAENGE_ANZAHL (sizeof(uebergaenge)/sizeof(uebergaenge[0]))
-
 
 Uebergang *laufender_uebergang;
 
-void uebergaenge_prefs_laden() {
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
-    Uebergang *u = uebergaenge[i];
+static void __upl(Uebergang *u) {
     u->prefs_laden();
-  }
+}
+
+void uebergaenge_prefs_laden() {
+  std::for_each(uebergaenge.begin(), uebergaenge.end(), __upl);
+}
+
+static void __ups(Uebergang *u) {
+    u->prefs_schreiben();
 }
 
 void uebergaenge_prefs_schreiben() {
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
-    Uebergang *u = uebergaenge[i];
-    u->prefs_schreiben();
-  }
+  std::for_each(uebergaenge.begin(), uebergaenge.end(), __ups);
 }
 
 void uebergaenge_prefs_ausgeben(String &s) {
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
+  for (int i = 0; i < uebergaenge.size(); i++) {
     Uebergang *u = uebergaenge[i];
     u->prefs_ausgeben(s);
   }
@@ -103,7 +102,7 @@ Uebergang *wuerfele_uebergang() {
   if (uebergaenge_summe_gewichte == 0) return nullptr; // da ist nichts zu wollen
   int32_t x = random(uebergaenge_summe_gewichte);
   Uebergang *u = nullptr;
-  for (int i = 0; i < UEBERGAENGE_ANZAHL && x >= 0; i++) {
+  for (int i = 0; i < uebergaenge.size() && x >= 0; i++) {
     u = uebergaenge[i];
     if (!u->aktiv) continue;
     x -= u->gewichtung;
@@ -127,9 +126,9 @@ void base_pipeline_fuellen() {
   }
 }
 
-static void uebergaenge_gewichtungen_summieren() {
+void uebergaenge_gewichtungen_summieren() {
   uebergaenge_summe_gewichte = 0;
-  for (int i = 0; i < UEBERGAENGE_ANZAHL; i++) {
+  for (int i = 0; i < uebergaenge.size(); i++) {
     Uebergang *u;
     u = uebergaenge[i];
     if (u->aktiv) uebergaenge_summe_gewichte += u->gewichtung;

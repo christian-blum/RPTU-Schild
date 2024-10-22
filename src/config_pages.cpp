@@ -3,7 +3,7 @@
 #include "config_pages.h"
 #include "my_webserver.h"
 #include "einstellungen.h"
-
+#include "uebergaenge.h"
 
 
 const char *html_landing_page = R"literal(
@@ -12,22 +12,24 @@ const char *html_landing_page = R"literal(
     <meta charset="UTF-8"> 
     <link rel='icon' href='/favicon.ico' sizes='any'>
     <link rel="stylesheet" href="/styles.css">
-    <title>RPTU Schild</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RPTU-Schild</title>
   </head>
   <body>
-    <h1>RPTU Schild</h2>
-    <p><a href='/config'>Allgemeine Konfiguration</a></p>
+    <h1>RPTU-Schild</h2>
+    <p><a href='/config'>Setup</a></p>
     <p><a href='/einstellungen'>Allgemeine Einstellungen</a></p>
     <p><a href='/uebergaenge'>Übergänge</a></p>
     <p><a href='/effekte'>Effekte</a></p>
     <br/>
     <hr/>
-    <p><small>###CREDITS###</br/>###RELEASEINFO###</small></p>
+    <p><small>###CREDITS###<br/>###RELEASEINFO###</small></p>
   </body>
 )literal";
 
 
 #define URI_EINSTELLUNGEN "/einstellungen"
+#define URI_UEBERGAENGE "/uebergaenge"
 
 extern const char *credits;
 extern const char *releaseInfo;
@@ -45,6 +47,7 @@ const char *html_einstellungen = R"literal(
   <head>
     <link rel='icon' href='/favicon.ico' sizes='any'>
     <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8"> 
     <title>RPTU-Schild - Einstellungen</title>
     <script>
@@ -54,7 +57,7 @@ const char *html_einstellungen = R"literal(
     </script>
   </head>
   <body>
-    <h1>RPTU Schild</h1>
+    <h1>RPTU-Schild</h1>
     <h2>Allgemeine Einstellungen</h2>
     <form method='POST' name='form'>
       <table border=0 width='100%'>
@@ -69,7 +72,7 @@ const char *html_einstellungen = R"literal(
     </form>
     <br/>
     <hr/>
-    <p><small>###CREDITS###</br/>###RELEASEINFO###</small></p>
+    <p><small>###CREDITS###<br/>###RELEASEINFO###</small></p>
   </body>
 )literal";
 
@@ -83,7 +86,7 @@ void config_pages_einstellungen() {
   uint8_t h;
   switch (method) {
   case HTTP_GET:
-    s = String(html_einstellungen);
+    s = html_einstellungen;
     s.replace("###HELLIGKEIT###", String(helligkeit));
     s.replace("###CREDITS###", webserver_quote_special(String(credits)));
     s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
@@ -128,9 +131,157 @@ void config_pages_einstellungen() {
   }
 }
 
+const char *html_uebergaenge_anfang = R"literal(
+  <!DOCTYPE html>
+  <head>
+    <link rel='icon' href='/favicon.ico' sizes='any'>
+    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8"> 
+    <title>RPTU-Schild - Übergänge</title>
+  </head>
+  <body>
+    <h1>RPTU-Schild</h1>
+    <h2>Übergänge</h2>
+    <form method='POST' name='form'>
+      <table border=0 width='100%'>
+)literal";
+const char *html_uebergaenge_ende = R"literal(
+      </table>
+      <input type='button' value='Zurück zum Menü' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='Ändern' onClick='document.form.submit()'>
+      <input type='hidden' name='defaults_laden' id='defaults_laden' value=''>
+      <input type='hidden' name='back' id='back' value=''>
+    </form>
+    <br/>
+    <hr/>
+    <p><small>###CREDITS###<br/>###RELEASEINFO###</small></p>
+  </body>
+)literal";
 
+
+void config_pages_uebergang(String &s, Uebergang *u) {
+  s += "<tr><td valign='top'><b>";
+  s += webserver_quote_special(u->name);
+  s += "</b><br/><small>";
+  s += webserver_quote_special(u->beschreibung);
+  s += "</small></td><td align='left' valign='top'>";
+  s += "<table border=0 width='100%'>";
+  for (int i = 0; i < u->parameter.size(); i++) {
+    struct sUebergangParameter *p = &u->parameter[i];
+    s += "<tr><td align='right'>";
+    s += webserver_quote_special(p->name);
+    s += ":</td><td><span style='white-space: nowrap;'>";
+    String _tag = u->tag;
+    _tag += "$";
+    _tag += p->tag;
+    switch (p->typ) {
+      case UPT_BOOL:
+        s += "<input type='hidden' name='";
+        s += _tag;
+        s += "' id='";
+        s += _tag;
+        s += "' value='";
+        s += (*((bool *)p->variable)) ? "on" : "off";
+        s += "'><input type='checkbox' onchange='document.getElementById(\"";
+        s += _tag;
+        s += "\").value = this.checked ? \"on\" : \"off\"'";
+        if (*((bool *)p->variable)) s += " checked";
+        s += ">";
+        break;
+      case UPT_USHORT:
+      case UPT_FLOAT:
+        s += "<input type='text' size='";
+        s += p->laenge;
+        s += "' name='";
+        s += _tag;
+        s += "' value='";
+        if (p->typ == UPT_USHORT) s += *((uint16_t *)p->variable);
+        else if (p->typ == UPT_FLOAT) s += *((float *)p->variable);
+        s += "'>";
+        if (p->einheit) { s += "&nbsp;"; s += webserver_quote_special(p->einheit); } 
+        break;
+    }
+    s += "</span></td></tr>";
+  }
+  s += "</table></td><td  valign='top'><input type='button' onclick='document.getElementById(\"defaults_laden\").value=\"";
+  s += u->tag;
+  s += "\"; document.form.submit()' value='Defaults'></td></tr>\n";
+}
+
+void config_pages_uebergaenge() {
+  HTTPMethod method = webserver.method();
+  String s;
+  String x;
+  bool e;
+  uint8_t h;
+  bool back = false;
+  switch (method) {
+  case HTTP_POST:
+    if ((x = webserver.arg("back")) == "back") {
+      back = true;
+    }
+    else if ((x = webserver.arg("defaults_laden")) != "") {
+      for (int i = 0; i < uebergaenge.size(); i++) {
+        Uebergang *u = uebergaenge[i];
+        if (x == u->tag) u->prefs_defaults();
+      }
+    }
+    else {
+      // jaja, das ist eklig ineffizient - aber es geht und es tut's
+      for (int i = 0; i < webserver.args(); i++) {
+        x = webserver.argName(i);
+        int p = x.indexOf('$');
+        if (p >= 0) {
+          String utag = x.substring(0, p);
+          String ptag = x.substring(p+1);
+          for (int j = 0; j < uebergaenge.size(); j++) {
+            Uebergang *u = uebergaenge[j];
+            if (utag == u->tag) {
+              for (int k = 0; k < u->parameter.size(); k++) {
+                struct sUebergangParameter *p = &u->parameter[k];
+                if (ptag == p->tag) {
+                  switch(p->typ) {
+                    case UPT_BOOL:
+                      *((bool *)p->variable) = (webserver.arg(i) == "on");
+                      break;
+                    case UPT_USHORT:
+                      *((uint16_t *)p->variable) = webserver.arg(i).toInt();
+                      break;
+                    case UPT_FLOAT:
+                      *((float *)p->variable) = webserver.arg(i).toFloat();
+                      break;
+                  }
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+    uebergaenge_prefs_schreiben();
+    // fall through
+  case HTTP_GET:
+    s = html_uebergaenge_anfang;
+    for (int i = 0; i < uebergaenge.size(); i++) {
+      config_pages_uebergang(s, uebergaenge[i]);
+    }
+    s += html_uebergaenge_ende;
+    s.replace("###CREDITS###", webserver_quote_special(String(credits)));
+    s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
+    if (back) {
+      webserver.sendHeader("Location", "/", true);  
+      webserver.send(307);
+    }
+    else {
+      webserver.send(200, "text/html", s);
+    }
+    break;
+  }
+}
 
 void setup_config_pages() {
   webserver_handle_root = config_pages_show_landing_page;
   webserver.on(URI_EINSTELLUNGEN, config_pages_einstellungen);
+  webserver.on(URI_UEBERGAENGE, config_pages_uebergaenge);
 }

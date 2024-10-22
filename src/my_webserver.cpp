@@ -193,6 +193,7 @@ void webserver_show_admin_form() {
   <head>
     <link rel='icon' href='/favicon.ico' sizes='any'>
     <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <title>ESP General Administration</title>
   </head>

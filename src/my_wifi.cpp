@@ -248,6 +248,7 @@ void wifi_show_config_form() {
     <link rel='icon' href='/favicon.ico' sizes='any'>
     <link rel="stylesheet" href="/styles.css">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ESP Network Config</title>
   </head>
   <body style='width:480px'>

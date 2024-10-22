@@ -11,11 +11,15 @@
 
 
 
-Uebergang_Slot_Machine::Uebergang_Slot_Machine(bool aktiv, uint16_t gewichtung, uint16_t delay, float speed_min, float speed_max, float damp_min, float damp_max) : Uebergang_sd(aktiv, gewichtung, 0, delay) {
+Uebergang_Slot_Machine::Uebergang_Slot_Machine(bool aktiv, uint16_t gewichtung, uint16_t delay, float speed_min, float speed_max, float damp_min, float damp_max) : Uebergang_d(aktiv, gewichtung, delay) {
   Uebergang_Slot_Machine::speed_min = default_speed_min = speed_min;
   Uebergang_Slot_Machine::speed_max = default_speed_max = speed_max;
   Uebergang_Slot_Machine::damp_min = default_damp_min = damp_min;
   Uebergang_Slot_Machine::damp_max = default_damp_max = damp_max;
+  parameter.push_back(P_SPEED_MIN);
+  parameter.push_back(P_SPEED_MAX);
+  parameter.push_back(P_DAMP_MIN);
+  parameter.push_back(P_DAMP_MAX);
   name = (char *)"Slot Machine";
   beschreibung = (char *)"Willkommen in Las Vegas, nur ohne Münzschlitz!";
   tag = (char *)"sm";
@@ -30,14 +34,21 @@ Uebergang_Slot_Machine::~Uebergang_Slot_Machine() {
 }
 
 void Uebergang_Slot_Machine::prefs_laden(Preferences& p) {
-  Uebergang_sd::prefs_laden(p);
+  Uebergang_d::prefs_laden(p);
   speed_min = p.getFloat(PREF_SPEED_MIN, speed_min);
+  if (speed_min < 0.1 || speed_min > 20) speed_min = default_speed_min;
   speed_max = p.getFloat(PREF_SPEED_MAX, speed_max);
+  if (speed_max < 0.1 || speed_max > 20) speed_max = default_speed_max;
+  if (speed_max < speed_min) speed_max = speed_min;
   damp_min = p.getFloat(PREF_DAMP_MIN, damp_min);
+  if (damp_min < 0.005 || damp_min > 0.5) damp_min = default_damp_min;
   damp_max = p.getFloat(PREF_DAMP_MAX, damp_max);
+  if (damp_max < 0.005 || damp_max > 0.5) damp_max = default_damp_max;
+  if (damp_max < damp_min) damp_max = damp_min;
 }
 
 void Uebergang_Slot_Machine::prefs_schreiben(Preferences& p) {
+  Uebergang_d::prefs_schreiben(p);
   if (p.getFloat(PREF_SPEED_MIN) != speed_min) p.putFloat(PREF_SPEED_MIN, speed_min);
   if (p.getFloat(PREF_SPEED_MAX) != speed_max) p.putFloat(PREF_SPEED_MAX, speed_max);
   if (p.getFloat(PREF_DAMP_MIN) != damp_min) p.putFloat(PREF_DAMP_MIN, damp_min);
@@ -45,10 +56,19 @@ void Uebergang_Slot_Machine::prefs_schreiben(Preferences& p) {
 }
 
 void Uebergang_Slot_Machine::prefs_ausgeben(String& s) {
+  Uebergang_d::prefs_ausgeben(s);
   PREF_AUSGEBEN(s, PREF_SPEED_MIN, speed_min);
   PREF_AUSGEBEN(s, PREF_SPEED_MAX, speed_max);
   PREF_AUSGEBEN(s, PREF_DAMP_MIN, damp_min);
   PREF_AUSGEBEN(s, PREF_DAMP_MAX, damp_max);
+}
+
+void Uebergang_Slot_Machine::prefs_defaults() {
+  speed_min = default_speed_min;
+  speed_max = default_speed_max;
+  damp_min = default_damp_min;
+  damp_max = default_damp_max;
+  Uebergang_d::prefs_defaults();
 }
 
 bool Uebergang_Slot_Machine::uebergang_morph(struct sKonfiguration *alt, struct sKonfiguration *neu, uint16_t morph_steps, uint16_t morph_delay, uint16_t morph_delay_ende) {
