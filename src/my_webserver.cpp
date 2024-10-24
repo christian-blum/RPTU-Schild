@@ -63,6 +63,7 @@ const char *updatePage = R"literal(
   <!DOCTYPE html>
   <link rel='icon' href='/favicon.ico' sizes='any'>
   <link rel="stylesheet" href="/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8"> 
   <body>
     <h2>ESP Firmware Update</h2>
@@ -101,6 +102,7 @@ const char *config_page = R"literal(
   <!DOCTYPE html>
   <link rel='icon' href='/favicon.ico' sizes='any'>
   <link rel="stylesheet" href="/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8"> 
   <body>
     <h2>ESP config</h2>

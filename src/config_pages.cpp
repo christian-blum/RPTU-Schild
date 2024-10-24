@@ -80,6 +80,7 @@ const char *html_einstellungen = R"literal(
 #define DEBUG_POST
 
 void config_pages_einstellungen() {
+  if (!webserver_admin_auth()) return;
   HTTPMethod method = webserver.method();
   String s;
   bool e;
@@ -209,6 +210,7 @@ void config_pages_uebergang(String &s, Uebergang *u) {
 }
 
 void config_pages_uebergaenge() {
+  if (!webserver_admin_auth()) return;
   HTTPMethod method = webserver.method();
   String s;
   String x;
