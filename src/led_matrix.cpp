@@ -2,7 +2,7 @@
 #include "led_matrix.h"
 #include "einstellungen.h"
 #include "pins.h"
-#include "my_scheduler.h"
+#include "cb_scheduler.h"
 #include "effekt.h"
 
 
@@ -19,13 +19,7 @@ bool semaphore_ledMatrix_update;
 // Konfiguration eingereiht wurde und vorher keine da war. Auch dann, gerade ein
 // dequeue stattgefunden hat.
 void base_scheduleDequeue(uint32_t milliseconds) {
-  struct sTask *t = (struct sTask *) malloc(sizeof(struct sTask));
-  memset(t, 0, sizeof(struct sTask));
-  t->semaphore = &semaphore_naechsteBaseAnzeigen;
-  scheduleIn(t, milliseconds);
-  //uint64_t tick = timerRead(scheduler_timer);
-  //t->tick = 1000 * milliseconds + tick;
-  //schedule(t);
+  scheduler.setMeInMilliseconds(&semaphore_naechsteBaseAnzeigen, milliseconds);
 }
 
 void base_queue(struct sBitmap *base) {

@@ -4,7 +4,7 @@
 #include "einstellungen.h"
 #include "pins.h"
 #include "osd.h"
-#include "my_scheduler.h"
+#include "cb_scheduler.h"
 #include "led_matrix.h"
 #include "defaults.h"
 
@@ -76,10 +76,7 @@ void tasten_loop() {
     if (digitalRead(HELLER_PIN)) {
       if (helligkeit < HELLIGKEIT_MAX) {
         helligkeit++;
-        struct sTask *t = (struct sTask *) malloc(sizeof(struct sTask));
-        memset(t, 0, sizeof(struct sTask));
-        t->semaphore = &semaphore_taste_heller;
-        scheduleIn(t, TASTENWIEDERHOLZEIT);
+        scheduler.setMeInMilliseconds(&semaphore_taste_heller, TASTENWIEDERHOLZEIT);
         semaphore_ledMatrix_update = true;
         preferences_speichern = true;
       }
@@ -91,10 +88,7 @@ void tasten_loop() {
     if (digitalRead(DUNKLER_PIN)) {
       if (helligkeit > HELLIGKEIT_MIN) {
         helligkeit--;
-        struct sTask *t = (struct sTask *) malloc(sizeof(struct sTask));
-        memset(t, 0, sizeof(struct sTask));
-        t->semaphore = &semaphore_taste_dunkler;
-        scheduleIn(t, TASTENWIEDERHOLZEIT);
+        scheduler.setMeInMilliseconds(&semaphore_taste_dunkler, TASTENWIEDERHOLZEIT);
         semaphore_ledMatrix_update = true;
         preferences_speichern = true;
       }

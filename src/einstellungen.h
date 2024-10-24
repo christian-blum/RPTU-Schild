@@ -53,6 +53,9 @@ extern volatile bool preferences_speichern;
 extern const char *credits;
 extern const char *releaseInfo;
 
+#include "cb_scheduler.h"
+extern CB_Scheduler scheduler;
+
 void preferences_ausgeben();
 void preferences_laden();
 void preferences_schreiben();

@@ -3,7 +3,7 @@
 #include "led_matrix.h"
 #include "defaults.h"
 #include "text_5x7.h"
-#include "my_scheduler.h"
+#include "cb_scheduler.h"
 #include "einstellungen.h"
 
 #ifdef HAVE_BLUETOOTH
@@ -128,11 +128,10 @@ static void zeichneSchalter(char *ueberschrift, bool schalter) {
 
 
 
-struct sTask * volatile taskOSDentfernen;
-
+cb_scheduler_handle_t taskOSDentfernen;
 
 static void ARDUINO_ISR_ATTR OSD_entfernen() { // wird nur aus dem Interrupt aufgerufen
-  taskOSDentfernen = NULL;  // wird im Interrupt vom Heap entfernt, wir löschen deshalb unseren Pointer auch.
+  taskOSDentfernen = 0;  // wird im Interrupt vom Heap entfernt, wir löschen deshalb unseren Pointer auch.
   semaphore_osd_entfernen = true;
 }
 
@@ -150,17 +149,12 @@ static void OSD_ggf_entfernen() {
 }
 
 static void OSD_Entfernen_schedulen() {
-  ATOMIC() {
-    if (taskOSDentfernen == NULL) {
-      taskOSDentfernen = (struct sTask *) malloc(sizeof(struct sTask));
-      memset(taskOSDentfernen, 0, sizeof(struct sTask));
-      taskOSDentfernen->function = &OSD_entfernen;
-      scheduleIn(taskOSDentfernen, OSD_DAUER);
+    if (!taskOSDentfernen) {
+      scheduler.callMeInMilliseconds(OSD_entfernen, OSD_DAUER);
     }
     else {
-      rescheduleIn(taskOSDentfernen, OSD_DAUER);
+      scheduler.rescheduleInMilliseconds(taskOSDentfernen, OSD_DAUER);
     }
-  }
 }
 
 static void zeigeHelligkeitAn() {

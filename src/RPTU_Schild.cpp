@@ -18,7 +18,7 @@
 #include "config_pages.h"
 #endif
 
-#include "my_scheduler.h"
+#include "cb_scheduler.h"
 #include "led_matrix.h"
 #include "effekt.h"
 #include "einstellungen.h"
@@ -52,7 +52,7 @@
 
 
 
-
+CB_Scheduler scheduler;
 
 
 
@@ -169,7 +169,7 @@ void setup() {
   srand(generateRandomSeed());
   preferences_laden();
   ledMatrix_start();
-  scheduler_start();
+  scheduler.begin();
   tasten_setup();
   test_reset();
 #ifdef HAVE_BLUETOOTH
@@ -202,6 +202,7 @@ static bool istAus;
 
 
 void loop() {
+  scheduler.loop();
   tasten_loop();
   if (einaus) {
     if (istAus) istAus = false;
@@ -228,7 +229,7 @@ void loop() {
     // davor gegebenenfalls Overlays rendern - die setzen dieselbe Semaphore
     if (semaphore_ledMatrix_update) {
 #ifdef FRAMERATE_MAX
-      uint64_t stand = timerRead(scheduler_timer);
+      uint64_t stand = timerRead(scheduler.timer);
       if (stand - ledMatrix_letztes_update >= SCHEDULER_TIMER_FREQUENZ / FRAMERATE_MAX) {
         ledMatrix_letztes_update = stand;
 #endif

@@ -7,7 +7,7 @@
 #include "defaults.h"
 #include "einstellungen.h"
 #include "gimp_artwork.h"
-#include "my_scheduler.h"
+#include "cb_scheduler.h"
 
 #define PREF_NAMESPACE_EFFEKTE "effekte"
 
@@ -370,10 +370,7 @@ void effekt_pipeline_fuellen() {
 // Konfiguration eingereiht wurde und vorher keine da war. Auch dann, gerade ein
 // dequeue stattgefunden hat.
 void effekt_scheduleDequeue(uint32_t milliseconds) {
-  struct sTask *t = (struct sTask *) malloc(sizeof(struct sTask));
-  memset(t, 0, sizeof(struct sTask));
-  t->semaphore = &semaphore_naechstesEffektLayerAnzeigen;
-  scheduleIn(t, milliseconds);
+  scheduler.setMeInMilliseconds(&semaphore_naechstesEffektLayerAnzeigen, milliseconds);
 }
 
 // ruft man auf, wenn man die nächste Konfiguration bearbeiten soll (also die Semaphore gesetzt ist)
