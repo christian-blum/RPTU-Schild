@@ -86,7 +86,7 @@ static void zeichneRelativindikator(char *ueberschrift, float fortschritt) {
   struct sPosition textpos;
   textpos.x = 15 - textbreite / 2;
   textpos.y = 9;
-  text_rendern(bitmap, textpos, farbe_schrift, farbe_hintergrund, ueberschrift);
+  text_rendern(bitmap, textpos, &farbe_schrift, &farbe_hintergrund, ueberschrift);
   zeichneFortschrittsbalkenMitRand(bitmap, farbe_balken, farbe_rahmen, farbe_balkenhintergrund, 2, 17, 28, 4, fortschritt);
   ledMatrix_updateLayer(LAYER_OSD, bitmap); // bitmap wird davon freigegeben
 }
@@ -108,7 +108,7 @@ static void zeichneSchalter(char *ueberschrift, bool schalter) {
   struct sPosition textpos;
   textpos.x = 15 - textbreite / 2;
   textpos.y = 9;
-  text_rendern(bitmap, textpos, farbe_schrift, farbe_hintergrund, ueberschrift);
+  text_rendern(bitmap, textpos, &farbe_schrift, &farbe_hintergrund, ueberschrift);
 
   float fortschritt;
   if (!schalter) {

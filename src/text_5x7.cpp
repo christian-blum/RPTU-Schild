@@ -1,4 +1,5 @@
 #include <Arduino.h>
+
 #include "text_5x7.h"
 #include "led_matrix.h"
 #include "effekt.h"
@@ -268,7 +269,7 @@ static const uint8_t font_5x7[] = {
 
 
 
-void zeichen_5x7_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe, uint8_t c) {
+void zeichen_5x7_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe, uint8_t c) {
   const uint8_t *z;
   z = font_5x7 + 5*c;
   uint8_t b = 0x01;
@@ -280,10 +281,10 @@ void zeichen_5x7_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCR
         int16_t xxx = xx + x;
         if (xxx >= 0 && xxx < LED_COUNT_X) {
           if (*(z+xx) & b) {
-            bitmap[p + xxx] = schriftfarbe;
+            bitmap[p + xxx] = *schriftfarbe;
           }
           else {
-            bitmap[p + xxx] = hintergrundfarbe;
+            bitmap[p + xxx] = *hintergrundfarbe;
           }
         }
       }
@@ -292,17 +293,17 @@ void zeichen_5x7_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCR
   }
 }
 
-void zeichen_5x7_leerspalte_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCRGBA hintergrundfarbe) {
+void zeichen_5x7_leerspalte_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCRGBA *hintergrundfarbe) {
   if (x < 0 || x >= LED_COUNT_X) return;
   for (int yy = 0; yy < 7; yy++) {
     int16_t yyy = yy + y;
     if (yyy >= 0 && yyy < LED_COUNT_Y) {
-      bitmap[yyy * LED_COUNT_X + x] = hintergrundfarbe;
+      bitmap[yyy * LED_COUNT_X + x] = *hintergrundfarbe;
     }
   }
 }
 
-void text_rendern(struct sCRGBA *bitmap, struct sPosition wo, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe, char *text) {
+void text_rendern(struct sCRGBA *bitmap, struct sPosition wo, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe, const char *text) {
   int x = wo.x;
   while (*text) {
     zeichen_5x7_rendern(bitmap, x, wo.y, schriftfarbe, hintergrundfarbe, *text);
@@ -311,29 +312,3 @@ void text_rendern(struct sCRGBA *bitmap, struct sPosition wo, struct sCRGBA schr
     x += 6;
   }
 }  
-
-bool laufschrift_rendern(struct sLaufschrift *ls) {
-  if (ls->count == 0) {
-    ls->zeichenzahl = strlen(ls->text);
-    ls->count_ende = (ls->zeichenzahl - 6) * 6;
-  }
-  if (ls->count % 6 == 0) { // 6 weil 5x7 font mit 1 Spalte Abstand
-    memcpy(ls->textfragment, ls->text+(ls->count/6), LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 1);
-    ls->textfragment[LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 1] = 0;
-  }
-  struct sPosition p;
-  p.y = ls->y;
-  p.x = -(ls->count % 6);
-
-  struct sBitmap *b = (struct sBitmap *) malloc(sizeof(struct sBitmap));
-  memset(b, 0, sizeof(struct sBitmap));
-  struct sCRGBA *bitmap = (struct sCRGBA *) calloc(LED_COUNT, sizeof(struct sCRGBA));
-  memset(bitmap, 0, sizeof(struct sCRGBA) * LED_COUNT);
-  text_rendern(bitmap, p, ls->schriftfarbe, ls->hintergrundfarbe, ls->textfragment);
-  b->bitmap = bitmap;
-  b->milliseconds = ls->millis;
-  effekt_queue(b);
-  ls->count++;
-  return ls->count >= ls->count_ende;
-}
-
