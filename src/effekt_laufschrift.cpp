@@ -1,13 +1,13 @@
 #include "effekt_laufschrift.h"
 
 
-Effekt_Laufschrift::Effekt_Laufschrift(bool aktiv, uint16_t gewichtung) : Effekt(aktiv, gewichtung) {
+Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung) : Effekt(loeschbar, aktiv, gewichtung) {
   text = nullptr;
   zeichenzahl = 0;
   count_ende = 0;
 }
 
-Effekt_Laufschrift::Effekt_Laufschrift(bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe) : Effekt_Laufschrift(aktiv, gewichtung) {
+Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe) : Effekt_Laufschrift(loeschbar, aktiv, gewichtung) {
   neuer_text(anzeigetext, ypos, millis, schriftfarbe, hintergrundfarbe);
 }
 

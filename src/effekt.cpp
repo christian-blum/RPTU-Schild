@@ -16,11 +16,58 @@ Effekt::Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung) {
   Effekt::loeschbar = loeschbar;
   Effekt::aktiv = Effekt::default_aktiv = aktiv;
   Effekt::gewichtung = Effekt::default_gewichtung = gewichtung;
+
+  tag = nullptr;
+  name = nullptr;
+  beschreibung = nullptr;
 }
 
 bool Effekt::doit() {
   return true; // na los, lach wieder, Compiler!
 }
+
+void Effekt::prefs_laden(Preferences& p) {
+  aktiv = p.getBool(PREF_AKTIV, aktiv);
+  gewichtung = p.getUShort(PREF_GEWICHTUNG, gewichtung);
+}
+
+void Effekt::prefs_laden() {
+  Preferences p;
+  p.begin(tag, true);
+  prefs_laden(p);
+  p.end();
+}
+
+void Effekt::prefs_schreiben(Preferences& p) {
+  if (p.getBool(PREF_AKTIV) != aktiv) p.putBool(PREF_AKTIV, aktiv);
+  if (p.getUShort(PREF_GEWICHTUNG) != gewichtung) p.putUShort(PREF_GEWICHTUNG, gewichtung);
+}
+
+void Effekt::prefs_schreiben() {
+  Preferences p;
+  p.begin(tag, false);
+  prefs_schreiben(p);
+  p.end();
+}
+
+void Effekt::prefs_ausgeben(String& s) {
+  PREF_AUSGEBEN(s, PREF_AKTIV, aktiv);
+  PREF_AUSGEBEN(s, PREF_GEWICHTUNG, gewichtung);
+}
+
+void Effekt::prefs_defaults() {
+  aktiv = default_aktiv;
+  gewichtung = default_gewichtung;
+  effekte_gewichtungen_summieren();
+}
+
+
+
+
+
+
+
+
 
 
 

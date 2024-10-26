@@ -2,6 +2,7 @@
 #define __EFFEKT_H
 
 #include <Arduino.h>
+#include <Preferences.h>
 
 extern uint16_t effekt_pipeline_laenge;
 extern struct sBitmap *effekt_pipelineHead;
@@ -16,6 +17,14 @@ void effekt_pipeline_fuellen();
 struct sBitmap *effekt_dequeue();
 
 
+
+// Die brauchen wir für viele Effekte, und so müssen wir sie nur einmal definieren.
+#define PREF_AKTIV "aktiv"
+#define PREF_GEWICHTUNG "gewichtung"
+
+#define PREF_AUSGEBEN(s, t, v) s += tag; s += "."; s += t; s += "="; s += v; s += "\n"
+
+
 class Effekt {
   private:
 
@@ -23,7 +32,7 @@ class Effekt {
 
     const char *tag;
     const char *name;
-    const char *description;
+    const char *beschreibung;
     bool loeschbar;
     bool default_aktiv;
     bool aktiv;
@@ -33,6 +42,12 @@ class Effekt {
     Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung);
 
     virtual bool doit();
+    virtual void prefs_laden(Preferences& p);
+    virtual void prefs_laden() final;
+    virtual void prefs_schreiben(Preferences& p);
+    virtual void prefs_schreiben() final;
+    virtual void prefs_ausgeben(String& s);
+    virtual void prefs_defaults();
 };
 
 #endif

@@ -20,9 +20,9 @@ class Effekt_Laufschrift : public Effekt {
     char textfragment[LAUFSCHRIFT_TEXTFRAGMENT_GROESSE];
 
   public:
-    Effekt_Laufschrift(bool aktiv, uint16_t gewichtung);
+    Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung);
    ~Effekt_Laufschrift();
-    Effekt_Laufschrift(bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe);
+    Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe);
 
     // bitte nicht extern manipulieren!
     int16_t y;  // Position auf Display
