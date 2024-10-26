@@ -8,6 +8,11 @@
 // warum +2? Eins damit man bis zu einem kompletten Zeichen schieben kann, und eins für die terminierende \0
 #define LAUFSCHRIFT_TEXTFRAGMENT_GROESSE ((LED_COUNT_X + TEXT_5X7_SPALTEN_PRO_ZEICHEN - 1) / TEXT_5X7_SPALTEN_PRO_ZEICHEN + 2)
 
+#define PREF_ANZEIGETEXT "anzeigetext"
+#define PREF_SCHRIFTFARBE "schriftf"
+#define PREF_HINTERGRUNDFARBE "hintergrundf"
+#define PREF_MILLIS "millis"
+#define PREF_YPOS "ypos"
 
 class Effekt_Laufschrift : public Effekt {
   private:
@@ -22,17 +27,27 @@ class Effekt_Laufschrift : public Effekt {
   public:
     Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung);
    ~Effekt_Laufschrift();
-    Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe);
+    Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe);
 
-    // bitte nicht extern manipulieren!
-    int16_t y;  // Position auf Display
+    // bitte nichts davon extern manipulieren!
+    const char *default_anzeigetext;
     const char *anzeigetext;
-    struct sCRGBA *schriftfarbe;
-    struct sCRGBA *hintergrundfarbe;
+    int16_t default_ypos;
+    int16_t ypos;  // Position auf Display
+    struct sCRGBA default_schriftfarbe;
+    struct sCRGBA schriftfarbe;
+    struct sCRGBA default_hintergrundfarbe;
+    struct sCRGBA hintergrundfarbe;
+    uint16_t default_millis;
     uint16_t millis; // pro Schritt nach links
 
-    void neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe);
+    void neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe);
     bool doit() override;
+    void prefs_laden(Preferences& p) override;
+    void prefs_schreiben(Preferences& p) override;
+    void prefs_ausgeben(String& s) override;
+    void prefs_defaults() override;
+
 };
 
 

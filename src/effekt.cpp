@@ -71,49 +71,6 @@ void Effekt::prefs_defaults() {
 
 
 
-/*
-struct sLaufschrift *els;
-
-
-bool effekt_laufschrift() {
-  bool fertig = laufschrift_rendern(els);
-  if (fertig) {
-    free(els);
-    els = NULL;
-  }
-  return fertig;
-}
-
-*/
-
-
-bool effekt_laufschrift_credits() {
-  if (!els) {
-    els = (struct sLaufschrift *) malloc(sizeof(struct sLaufschrift));
-    memset(els, 0, sizeof(sLaufschrift));
-    els->text = credits;
-    els->y = (LED_COUNT_Y - 7) / 2;
-    els->schriftfarbe.x = LAUFSCHRIFT_CREDITS_SCHRIFTFARBE;
-    els->hintergrundfarbe.x = LAUFSCHRIFT_CREDITS_HINTERGRUNDFARBE;
-    els->millis = laufschrift_delay;
-  }
-  return effekt_laufschrift();
-}
-
-bool effekt_laufschrift_releaseInfo() {
-  if (!els) {
-    els = (struct sLaufschrift *) malloc(sizeof(struct sLaufschrift));
-    memset(els, 0, sizeof(struct sLaufschrift));
-    els->text = releaseInfo;
-    els->y = (LED_COUNT_Y - 7);
-    els->schriftfarbe.x = LAUFSCHRIFT_RELEASEINFO_SCHRIFTFARBE;
-    els->hintergrundfarbe.x = LAUFSCHRIFT_RELEASEINFO_HINTERGRUNDFARBE;
-    els->millis = laufschrift_delay;
-  }
-  return effekt_laufschrift();
-}
-
-
 
 
 
