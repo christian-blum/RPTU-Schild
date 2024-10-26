@@ -3,6 +3,8 @@
 #include "effekte.h"
 #include "led_matrix.h"
 #include "einstellungen.h"
+#include "gimp_smiley_grinsend.h"
+#include "effekt_gimp.h"
 
 #include <vector>
 
@@ -14,6 +16,11 @@ struct sBitmap *effekt_pipelineHead;
 struct sBitmap *effekt_pipelineTail;
 
 
+Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
+
+std::array<Effekt *, 1> effekte_prototypen = {
+  &effekt_smiley_grinsend,
+};
 
 std::vector<Effekt> effekte;
 uint32_t effekte_summe_gewichte;
@@ -79,7 +86,7 @@ void effekte_setze_laufender_effekt(int welcher) {
     effekt_laufend = &effekte[welcher];
 }
 
-void effekt_pipeline_fuellen() {
+void effekte_pipeline_fuellen() {
   //  if (!einaus) return;  // Wenn das Schild gerade nicht an ist, brauchen auch keine Effekte erzeugt zu werden.
   if (effekt_pipeline_laenge >= EFFEKTE_PIPELINE_MINDESTLAENGE) return;  // wir haben genug auf Halde.
   if (!effekt_laufend) {

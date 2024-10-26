@@ -20,13 +20,12 @@
 
 #include "cb_scheduler.h"
 #include "led_matrix.h"
-#include "effekt.h"
+#include "effekte.h"
 #include "einstellungen.h"
 #include "tasten.h"
 #include "osd.h"
 #include "uebergaenge.h"
 #include "rptu_stuff.h"
-#include "text_5x7.h"
 #include "tasten.h"
 
 
@@ -208,7 +207,7 @@ void loop() {
     if (istAus) istAus = false;
 
     base_pipeline_fuellen();
-    effekt_pipeline_fuellen();
+    effekte_pipeline_fuellen();
 
     if (semaphore_naechsteBaseAnzeigen) {
       semaphore_naechsteBaseAnzeigen = false;

@@ -6,11 +6,12 @@
 
 class Effekt_GIMP : public Effekt {
 
-  struct sGIMP *artwork;
+  const struct sGIMP *artwork;
 
   public:
-    Effekt_GIMP(bool aktiv, uint16_t gewichtung, struct sGIMP *artwork, uint16_t dauer);
+    Effekt_GIMP(bool loeschbar, bool aktiv, uint16_t gewichtung, const struct sGIMP *artwork, uint16_t dauer);
 
+    uint16_t default_dauer;
     uint16_t dauer;
 
     bool doit() override;

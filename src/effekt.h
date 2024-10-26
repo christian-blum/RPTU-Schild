@@ -24,10 +24,13 @@ class Effekt {
     const char *tag;
     const char *name;
     const char *description;
+    bool loeschbar;
+    bool default_aktiv;
     bool aktiv;
+    uint16_t default_gewichtung;
     uint16_t gewichtung;
 
-    Effekt(bool aktiv, uint16_t gewichtung);
+    Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung);
 
     virtual bool doit();
 };

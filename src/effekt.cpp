@@ -12,9 +12,10 @@
 
 
 
-Effekt::Effekt(bool aktiv, uint16_t gewichtung) {
-  Effekt::aktiv = aktiv;
-  Effekt::gewichtung = gewichtung;
+Effekt::Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung) {
+  Effekt::loeschbar = loeschbar;
+  Effekt::aktiv = Effekt::default_aktiv = aktiv;
+  Effekt::gewichtung = Effekt::default_gewichtung = gewichtung;
 }
 
 bool Effekt::doit() {
@@ -69,32 +70,6 @@ bool effekt_laufschrift_releaseInfo() {
 
 
 
-
-bool effekt_bild(const struct sGIMP *welcher) {
-  struct sBitmap *b = (struct sBitmap *) malloc(sizeof(struct sBitmap));
-  memset(b, 0, sizeof(struct sBitmap));
-  struct sCRGBA *bitmap = (struct sCRGBA *) calloc(LED_COUNT, sizeof(struct sCRGBA));
-  memset(bitmap, 0, sizeof(struct sCRGBA) * LED_COUNT);
-  gimp_rendern(bitmap, welcher, LED_COUNT_X / 2, LED_COUNT_Y / 2, REFPUNKT_MITTE, 192);
-  b->bitmap = bitmap;
-  uint32_t milliseconds = 5000;
-  b->milliseconds = milliseconds;
-  effekt_queue_bitmap(b);
-  return true;
-}
-
-
-
-
-bool effekt_smiley_grinsend() {
-  return effekt_bild(&gimp_smiley_grinsend);
-}
-
-
-
-
-
-
 struct sEffektDef {
   const char *name;
   bool aktiv;
@@ -111,7 +86,7 @@ struct sEffekt {
 const struct sEffektDef effekte_defaults[] = {
   "Laufschrift Version", false,  100, effekt_laufschrift_releaseInfo,  // er wird aber beim Booten getriggert
   "Laufschrift Credits", true,   100, effekt_laufschrift_credits,
-  "Grinse-Smiley",       true,   200, effekt_smiley_grinsend,
+//  "Grinse-Smiley",       true,   200, effekt_smiley_grinsend,
 };
 
 #define EFFEKTE_ANZAHL (sizeof(effekte_defaults) / sizeof(effekte_defaults[0]))

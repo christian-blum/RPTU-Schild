@@ -9,4 +9,6 @@
 #define EFFEKTE_PIPELINE_MINDESTLAENGE 2
 #define EFFEKTE_PIPELINE_MAXIMALLAENGE 5
 
+extern void effekte_pipeline_fuellen();
+
 #endif
