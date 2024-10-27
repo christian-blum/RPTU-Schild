@@ -15,24 +15,20 @@
 uint16_t effekt_pipeline_laenge;
 struct sBitmap *effekt_pipelineHead;
 struct sBitmap *effekt_pipelineTail;
-/*
+
 struct sCRGBA ls_releaseInfo_hintergrundfarbe = { .x = 0xff100000 };
 struct sCRGBA ls_releaseInfo_schriftfarbe = { .x = 0xff00c0c0 };
 struct sCRGBA ls_credits_hintergrundfarbe = { .x = 0xfc000000 };
 struct sCRGBA ls_credits_schriftfarbe = { .x = 0xfc00c000 };
-*/
-/*
-Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
+
 Effekt_Laufschrift effekt_laufschrift_releaseInfo(false, true, 100, releaseInfo, 25, 70, ls_releaseInfo_schriftfarbe, ls_releaseInfo_hintergrundfarbe);
 Effekt_Laufschrift effekt_laufschrift_credits(false, true, 100, credits, 8, 70, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
-*/
+Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
 
-std::array<Effekt *, 0> effekte_prototypen = {
-/*
+std::array<Effekt *, 1> effekte_prototypen = {
+//  &effekt_laufschrift_releaseInfo,
+//  &effekt_laufschrift_credits,
   &effekt_smiley_grinsend,
-  &effekt_laufschrift_releaseInfo,
-  &effekt_laufschrift_credits
-*/
 };
 
 std::vector<Effekt *> effekte;

@@ -33,7 +33,9 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   char *dat = new char[strlen(anzeigetext)+1];
   memcpy(dat, anzeigetext, l);
   default_anzeigetext = dat;
-  neuer_text(anzeigetext, ypos, millis, schriftfarbe, hintergrundfarbe);
+  char *at = new char[strlen(anzeigetext)+1];
+  memcpy(at, default_anzeigetext, strlen(default_anzeigetext)+1);
+  anzeigetext = at;
 }
 
 Effekt_Laufschrift::~Effekt_Laufschrift() {
