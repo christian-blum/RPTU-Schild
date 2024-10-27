@@ -7,11 +7,6 @@
 #undef HAVE_BLUETOOTH
 #define HAVE_BACKDOOR
 
-#ifdef HAVE_BACKDOOR
-#define BACKDOOR_USERNAME "chris"
-#define BACKDOOR_PASSWORD "Go485kg!"
-#endif
-
 #define TASTENWIEDERHOLZEIT 30 // und das sind 30 Millisekunden, also maximal 33 Inkrementschritte pro Sekunde
 #define OSD_DAUER 3000
 

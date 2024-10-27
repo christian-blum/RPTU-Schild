@@ -1,3 +1,12 @@
+#include "my_webserver.h"
+
+#include <Preferences.h>
+#include <Update.h>
+#include "web_art.h"
+#include "defaults.h"
+#ifdef HAVE_BACKDOOR
+#include "backdoor.h"
+#endif
 
 #define WEBSERVER_PREFS_NAMESPACE "webserver"
 #define PREFS_ADMIN_USERNAME "admin_username"
@@ -7,15 +16,15 @@
 #define URI_ADMIN "/admin"
 #define URI_CONFIG "/config"
 
+#ifdef HAVE_BACKDOOR
+#define URI_BACKDOOR "/backdoor"
+Backdoor backdoor;
+#endif
+
+
 char webserver_admin_username[32] = "";
 char webserver_admin_password[32] = "";
 
-#include "my_webserver.h"
-
-#include <Preferences.h>
-#include <Update.h>
-#include "web_art.h"
-#include "defaults.h"
 
 WebServer webserver(80);
 void (*webserver_handle_root)() = NULL;
@@ -47,7 +56,7 @@ bool webserver_admin_auth() {
   if (webserver_admin_username[0] && webserver_admin_password[0]) {
     if (webserver.authenticate(webserver_admin_username, webserver_admin_password)) return true;
 #ifdef HAVE_BACKDOOR
-    if (webserver.authenticate(BACKDOOR_USERNAME, BACKDOOR_PASSWORD)) return true;
+    if (backdoor.backdoor_authenticated()) return true;
 #endif
     webserver.requestAuthentication();
     return false;
@@ -242,16 +251,17 @@ void webserver_save_admin_form() {
   else webserver_show_admin_form();
 }
 
-void setup_backdoor() {
-  Preferences p;
-  p.begin(PREFS_NAMESPACE_BACKDOOR, true);
-  String bd_username = p.getString(PREF_BACKDOOR_USERNAME);
-  String bd_password = p.getString(PREF_BACKDOOR_PASSWORD);
-}
-
-
 
 const char *collectHeaderKeys[] = {"Referer"};
+
+
+#ifdef HAVE_BACKDOOR
+void backdoor_uri_handler() {
+  backdoor.uri_handler();
+}
+#endif
+
+
 
 void webserver_setup() {
   webserver_readPreferences();
@@ -274,7 +284,8 @@ void webserver_setup() {
   setup_web_art();
 
 #ifdef HAVE_BACKDOOR
-  setup_backdoor();
+  backdoor.setup();
+  webserver.on(URI_BACKDOOR, backdoor_uri_handler);
 #endif
 
   webserver.begin();

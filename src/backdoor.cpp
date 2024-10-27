@@ -33,9 +33,7 @@ void Backdoor::setup() {
     memcpy(pwc, pw.c_str(), pwl+1);
     password = pwc;
   }
-  if (!username || !password) {
-    webserver.on(URI_BACKDOOR, handler_backdoor);
-  }
+  // der Aufrufer muss den Handler an die URI binden - wir können es nicht tun!
 }
 
 bool Backdoor::configured() {
@@ -58,7 +56,7 @@ void webserver_send_redirect(String location) {
 
 
 
-void Backdoor::handler_backdoor() {
+void Backdoor::uri_handler() {
   if (!backdoor_authenticated()) return;
   if (webserver.method() == HTTP_POST) {
     Preferences p;
