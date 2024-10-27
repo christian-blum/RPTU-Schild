@@ -166,6 +166,9 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(115200);
 #endif
+  delay(500);
+  show_chip_data();
+  delay(5000);
   srand(generateRandomSeed());
   preferences_laden();
   ledMatrix_start();
@@ -183,7 +186,6 @@ void setup() {
   setup_uebergaenge();
   setup_effekte();
   effekte_setze_laufender_effekt(0); // release info - dieser Hack gefällt mir gar nicht
-  show_chip_data();
 }
 
 
