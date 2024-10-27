@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Preferences.h>
 
+#include "effekte.h"
 #include "effekt.h"
 #include "led_matrix.h"
 #include "text_5x7.h"
@@ -70,45 +71,7 @@ void Effekt::prefs_defaults() {
 
 
 
-
-
-
-
-struct sEffektDef {
-  const char *name;
-  bool aktiv;
-  uint16_t gewichtung;
-  bool (*funktion)();
-};
-
-struct sEffekt {
-  bool aktiv;
-  uint16_t gewichtung;
-  bool (*funktion)();
-};
-
-const struct sEffektDef effekte_defaults[] = {
-  "Laufschrift Version", false,  100, effekt_laufschrift_releaseInfo,  // er wird aber beim Booten getriggert
-  "Laufschrift Credits", true,   100, effekt_laufschrift_credits,
-//  "Grinse-Smiley",       true,   200, effekt_smiley_grinsend,
-};
-
-#define EFFEKTE_ANZAHL (sizeof(effekte_defaults) / sizeof(effekte_defaults[0]))
-
-struct sEffekt effekte[EFFEKTE_ANZAHL];
-
-uint32_t effekte_summe_gewichte;
-
-void effekte_gewichtungen_summieren() {
-  effekte_summe_gewichte = 0;
-  for (int i = 0; i < EFFEKTE_ANZAHL; i++) {
-    struct sEffekt *e;
-    e = &effekte[i];
-    if (e->aktiv) effekte_summe_gewichte += e->gewichtung;
-  }
-}
-
-
+/*
 
 #define EFFEKTE_DELIMITER ";"
 
@@ -167,11 +130,7 @@ void effekte_speichern() {
   p.end();
 }
 
-
-
-void setup_effekte() {
-  effekte_laden();
-}
+*/
 
 
 

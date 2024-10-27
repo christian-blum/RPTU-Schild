@@ -13,13 +13,14 @@ private:
 
 public:
   Backdoor();
+ ~Backdoor();
 
   const char *username;
   const char *password;
 
   void setup();
   bool configured();
-  bool Backdoor::backdoor_authenticated();
+  bool backdoor_authenticated();
   void uri_handler();
 
 };

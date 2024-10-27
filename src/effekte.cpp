@@ -5,6 +5,7 @@
 #include "einstellungen.h"
 #include "gimp_smiley_grinsend.h"
 #include "effekt_gimp.h"
+#include "effekt_laufschrift.h"
 
 #include <vector>
 
@@ -15,35 +16,43 @@ uint16_t effekt_pipeline_laenge;
 struct sBitmap *effekt_pipelineHead;
 struct sBitmap *effekt_pipelineTail;
 
+struct sCRGBA ls_releaseInfo_hintergrundfarbe = { .x = 0xff100000 };
+struct sCRGBA ls_releaseInfo_schriftfarbe = { .x = 0xff00c0c0 };
+struct sCRGBA ls_credits_hintergrundfarbe = { .x = 0xfc000000 };
+struct sCRGBA ls_credits_schriftfarbe = { .x = 0xfc00c000 };
 
 Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
+Effekt_Laufschrift effekt_laufschrift_releaseInfo(false, true, 100, releaseInfo, 25, 70, ls_releaseInfo_schriftfarbe, ls_releaseInfo_hintergrundfarbe);
+Effekt_Laufschrift effekt_laufschrift_credits(false, true, 100, credits, 8, 70, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
 
-std::array<Effekt *, 1> effekte_prototypen = {
+std::array<Effekt *, 3> effekte_prototypen = {
   &effekt_smiley_grinsend,
+  &effekt_laufschrift_releaseInfo,
+  &effekt_laufschrift_credits
 };
 
-std::vector<Effekt> effekte;
+std::vector<Effekt *> effekte;
 uint32_t effekte_summe_gewichte;
 Effekt *effekt_laufend;
 
-void effekte_gewichte_summieren() {
+void effekte_gewichtungen_summieren() {
   uint32_t sg = 0;
-  for (std::vector<Effekt>::iterator i = effekte.begin(); i < effekte.end(); i++) {
-    sg += i->gewichtung;
+  for (std::vector<Effekt *>::iterator i = effekte.begin(); i < effekte.end(); i++) {
+    sg += (*i)->gewichtung;
   }
   effekte_summe_gewichte = sg;
 }
 
-void effekt_hinzufuegen(Effekt effekt) {
+void effekt_hinzufuegen(Effekt *effekt) {
   effekte.push_back(effekt);
-  effekte_gewichte_summieren();
+  effekte_gewichtungen_summieren();
 }
 
 bool effekt_entfernen(int index) {
-  Effekt *e = &effekte.at(index);
+  Effekt *e = effekte.at(index);
   if (e != effekt_laufend) { // nicht löschen, wenn der Effekt gerade läuft!
     effekte.erase(effekte.begin() + index);
-    effekte_gewichte_summieren();
+    effekte_gewichtungen_summieren();
     return true;
   }
   return false;
@@ -74,16 +83,16 @@ void effekt_schedule_pause(uint32_t milliseconds) {
 Effekt *effekt_wuerfeln() {
   if (!effekte_summe_gewichte) return nullptr;
   int32_t x = random(effekte_summe_gewichte);
-  for (std::vector<Effekt>::iterator i = effekte.begin(); i < effekte.end(); i++) {
-    x -= i->gewichtung;
-    if (x < 0) return &effekte[0] + (i - effekte.begin());
+  for (std::vector<Effekt *>::iterator i = effekte.begin(); i < effekte.end(); i++) {
+    x -= (*i)->gewichtung;
+    if (x < 0) return effekte[0] + (i - effekte.begin());
     // seufz. Siehe https://iris.artins.org/software/converting-an-stl-vector-iterator-to-a-raw-pointer/
   }
   return nullptr;
 }
 
 void effekte_setze_laufender_effekt(int welcher) {
-    effekt_laufend = &effekte[welcher];
+    effekt_laufend = effekte[welcher];
 }
 
 void effekte_pipeline_fuellen() {
@@ -99,6 +108,12 @@ void effekte_pipeline_fuellen() {
     if (abgeschlossen) {
       effekt_laufend = nullptr;
     }
+  }
+}
+
+void setup_effekte() {
+  for (int i = 0; i < effekte_prototypen.size(); i++) {
+    effekt_hinzufuegen(effekte_prototypen[i]);
   }
 }
 
