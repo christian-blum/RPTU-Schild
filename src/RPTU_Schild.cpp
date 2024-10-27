@@ -134,8 +134,10 @@ void show_chip_data() {
 
 void zuruecksetzen() {
   Serial.println("Alles auf Anfang. Alles Gute!");
+#ifdef HAVE_WEBSERVER
   wifi_clearPreferences();
   webserver_clearPreferences();
+#endif
   preferences_loeschen();
   esp_restart();
 }
@@ -165,10 +167,9 @@ void test_reset() {
 void setup() {
 #ifdef DEBUG
   Serial.begin(115200);
+  while (!Serial) {}
 #endif
-  delay(500);
   show_chip_data();
-  delay(5000);
   srand(generateRandomSeed());
   preferences_laden();
   ledMatrix_start();
@@ -185,7 +186,7 @@ void setup() {
 #endif
   setup_uebergaenge();
   setup_effekte();
-  effekte_setze_laufender_effekt(0); // release info - dieser Hack gefällt mir gar nicht
+  //effekte_setze_laufender_effekt(0); // release info - dieser Hack gefällt mir gar nicht
 }
 
 

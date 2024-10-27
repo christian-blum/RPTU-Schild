@@ -6,6 +6,7 @@
 #define HAVE_WEBSERVER
 #undef HAVE_BLUETOOTH
 #define HAVE_BACKDOOR
+#define HAVE_FAVICON
 
 #define TASTENWIEDERHOLZEIT 30 // und das sind 30 Millisekunden, also maximal 33 Inkrementschritte pro Sekunde
 #define OSD_DAUER 3000
