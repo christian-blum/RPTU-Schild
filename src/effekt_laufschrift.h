@@ -24,6 +24,8 @@ class Effekt_Laufschrift : public Effekt {
     volatile bool semaphore;  // brauche ich die?
     char textfragment[LAUFSCHRIFT_TEXTFRAGMENT_GROESSE];
 
+    void text_padding();
+
   public:
     Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung);
    ~Effekt_Laufschrift();

@@ -25,10 +25,10 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   name = _name;
   beschreibung = "Zeigt sporadisch eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Umlaute Ä, Ö und Ü sowie ß sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
 
-  Effekt_Laufschrift::default_millis = millis;
-  Effekt_Laufschrift::default_schriftfarbe = schriftfarbe;
-  Effekt_Laufschrift::default_hintergrundfarbe = hintergrundfarbe;
-  Effekt_Laufschrift::default_ypos = ypos;
+  Effekt_Laufschrift::millis = Effekt_Laufschrift::default_millis = millis;
+  Effekt_Laufschrift::schriftfarbe = Effekt_Laufschrift::default_schriftfarbe = schriftfarbe;
+  Effekt_Laufschrift::hintergrundfarbe = Effekt_Laufschrift::default_hintergrundfarbe = hintergrundfarbe;
+  Effekt_Laufschrift::ypos = Effekt_Laufschrift::default_ypos = ypos;
   int l = strlen(anzeigetext)+1;
   char *dat = new char[strlen(anzeigetext)+1];
   memcpy(dat, anzeigetext, l);
@@ -36,12 +36,27 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   char *at = new char[strlen(anzeigetext)+1];
   memcpy(at, default_anzeigetext, strlen(default_anzeigetext)+1);
   Effekt_Laufschrift::anzeigetext = at;
+  text_padding();
 }
 
 Effekt_Laufschrift::~Effekt_Laufschrift() {
   if (text) { delete[] text; text = nullptr; zeichenzahl = 0; count_ende = 0; }
   if (anzeigetext) { delete[] anzeigetext; anzeigetext = nullptr; }
   if (default_anzeigetext) { delete[] default_anzeigetext; default_anzeigetext = nullptr; }
+}
+
+void Effekt_Laufschrift::text_padding() {
+  int anzeigetext_laenge = strlen(anzeigetext);
+  zeichenzahl = anzeigetext_laenge + (LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2) * 2;
+  char *neuer_text = new char[zeichenzahl + 1];
+  char *c = neuer_text;
+  for (int i = 0; i < LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2; i++) *c++ = ' ';
+  memcpy(c, anzeigetext, anzeigetext_laenge); c += anzeigetext_laenge;
+  for (int i = 0; i < LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2; i++) *c++ = ' ';
+  *c = '\0';
+  if (text) delete[] text;
+  text = neuer_text; // bitte so lassen, das ist narrensicher (zum Beispiel Aufruf mit Pointer auf alten Text auf dem Heap)
+  count_ende = (zeichenzahl - (LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2)) * TEXT_5X7_SPALTEN_PRO_ZEICHEN;
 }
 
 void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) {
@@ -53,23 +68,10 @@ void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint1
   Effekt_Laufschrift::millis = millis;
   Effekt_Laufschrift::schriftfarbe = schriftfarbe;
   Effekt_Laufschrift::hintergrundfarbe = hintergrundfarbe;
-
-  zeichenzahl = strlen(anzeigetext) + (LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2) * 2;
-  char *neuer_text = new char[zeichenzahl + 1];
-  char *c = neuer_text;
-  for (int i = 0; i < LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2; i++) *c++ = ' ';
-  memcpy(c, anzeigetext, zeichenzahl); c += zeichenzahl;
-  for (int i = 0; i < LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2; i++) *c++ = ' ';
-  *c = '\0';
-  if (text) delete[] text;
-  text = neuer_text; // bitte so lassen, das ist narrensicher (zum Beispiel Aufruf mit Pointer auf alten Text auf dem Heap)
-  count_ende = (zeichenzahl - (LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2)) * TEXT_5X7_SPALTEN_PRO_ZEICHEN;
+  text_padding();
   Effekt::prefs_schreiben();
 }
 
-#if 0
-bool Effekt_Laufschrift::doit() { return true; }
-#else
 bool Effekt_Laufschrift::doit() {
   if (count < count_ende) { // damit es bei Textänderungen nicht knallt, wenn der neue Text kürzer ist!
     // wenn wir ein neues Zeichen beginnen müssen, bauen wir den textfragment-Puffer neu auf
@@ -99,7 +101,6 @@ bool Effekt_Laufschrift::doit() {
   }
   return false;
 }
-#endif
 
 void Effekt_Laufschrift::prefs_laden(Preferences& p) {
   Effekt::prefs_laden(p);
