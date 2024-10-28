@@ -67,7 +67,7 @@ void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint1
   Effekt::prefs_schreiben();
 }
 
-#if 1
+#if 0
 bool Effekt_Laufschrift::doit() { return true; }
 #else
 bool Effekt_Laufschrift::doit() {

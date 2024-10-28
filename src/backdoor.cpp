@@ -40,17 +40,21 @@ bool Backdoor::configured() {
   return username && password;
 }
 
-
 bool Backdoor::authenticated() {
-  if (!username || !password) return true;
-  if (webserver.authenticate(username, password)) return true;
+  if (configured()) {
+    if (webserver.authenticate(username, password)) return true;
+  }
+  return false;
+}
+
+bool Backdoor::authenticate() {
+  if (authenticated()) return true;
   webserver.requestAuthentication();
   return false;
 }
 
-
 void Backdoor::uri_handler() {
-  if (!authenticated()) return;
+  if (!authenticate()) return;
   if (webserver.method() == HTTP_POST) {
     Preferences p;
     p.begin(PREF_NAMESPACE_BACKDOOR, false);

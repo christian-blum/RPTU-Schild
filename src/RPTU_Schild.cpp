@@ -186,7 +186,7 @@ void setup() {
 #endif
   setup_uebergaenge();
   setup_effekte();
-  //effekte_setze_laufender_effekt(0); // release info - dieser Hack gefällt mir gar nicht
+  effekte_setze_laufender_effekt(0); // release info - dieser Hack gefällt mir gar nicht
 }
 
 

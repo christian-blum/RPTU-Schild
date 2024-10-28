@@ -10,6 +10,7 @@
 class Backdoor {
 
 private:
+  bool authenticate();
 
 public:
   Backdoor();

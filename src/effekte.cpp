@@ -101,11 +101,11 @@ void effekte_pipeline_fuellen() {
   if (!effekt_laufend) {
     if (!effekte_einaus) return;
     effekt_schedule_pause(random(effekt_pause_max - effekt_pause_min) + effekt_pause_min);
-    //effekt_laufend = effekt_wuerfeln();
+    effekt_laufend = effekt_wuerfeln();
     effekt_laufend = effekte[1];
   }
   while (effekt_pipeline_laenge < EFFEKTE_PIPELINE_MAXIMALLAENGE && effekt_laufend) {
-    bool abgeschlossen = effekt_laufend->doit(); // dann rufen wir die Funktion mal auf...
+    bool abgeschlossen = effekt_laufend->doit();
     if (abgeschlossen) {
       effekt_laufend = nullptr;
     }
