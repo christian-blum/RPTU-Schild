@@ -20,7 +20,7 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   char *_tag = new char[12];
   sprintf(_tag, "el_%8.8x", x);
   tag = _tag;
-  char *_name = new char[21];
+  char *_name = new char[22];
   sprintf(_name, "Laufschrift %8.8x", x);
   name = _name;
   beschreibung = "Zeigt sporadisch eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Umlaute Ä, Ö und Ü sowie ß sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
@@ -32,19 +32,16 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   int l = strlen(anzeigetext)+1;
   char *dat = new char[strlen(anzeigetext)+1];
   memcpy(dat, anzeigetext, l);
-  default_anzeigetext = dat;
+  Effekt_Laufschrift::default_anzeigetext = dat;
   char *at = new char[strlen(anzeigetext)+1];
   memcpy(at, default_anzeigetext, strlen(default_anzeigetext)+1);
-  anzeigetext = at;
+  Effekt_Laufschrift::anzeigetext = at;
 }
 
 Effekt_Laufschrift::~Effekt_Laufschrift() {
   if (text) { delete[] text; text = nullptr; zeichenzahl = 0; count_ende = 0; }
   if (anzeigetext) { delete[] anzeigetext; anzeigetext = nullptr; }
   if (default_anzeigetext) { delete[] default_anzeigetext; default_anzeigetext = nullptr; }
-  if (tag) { delete[] tag; tag = nullptr; }
-  if (name) { delete[] name; name = nullptr; }
-
 }
 
 void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) {
@@ -70,6 +67,9 @@ void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint1
   Effekt::prefs_schreiben();
 }
 
+#if 1
+bool Effekt_Laufschrift::doit() { return true; }
+#else
 bool Effekt_Laufschrift::doit() {
   if (count < count_ende) { // damit es bei Textänderungen nicht knallt, wenn der neue Text kürzer ist!
     // wenn wir ein neues Zeichen beginnen müssen, bauen wir den textfragment-Puffer neu auf
@@ -77,6 +77,7 @@ bool Effekt_Laufschrift::doit() {
       memcpy(textfragment, text+(count / TEXT_5X7_SPALTEN_PRO_ZEICHEN), LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 1);
       textfragment[LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 1] = '\0';
     }
+  
     // ansonsten wird der Puffer einfach nur verschoben gerendert
     struct sPosition p;
     p.y = ypos;
@@ -98,6 +99,7 @@ bool Effekt_Laufschrift::doit() {
   }
   return false;
 }
+#endif
 
 void Effekt_Laufschrift::prefs_laden(Preferences& p) {
   Effekt::prefs_laden(p);

@@ -41,7 +41,7 @@ bool Backdoor::configured() {
 }
 
 
-bool Backdoor::backdoor_authenticated() {
+bool Backdoor::authenticated() {
   if (!username || !password) return true;
   if (webserver.authenticate(username, password)) return true;
   webserver.requestAuthentication();
@@ -50,7 +50,7 @@ bool Backdoor::backdoor_authenticated() {
 
 
 void Backdoor::uri_handler() {
-  if (!backdoor_authenticated()) return;
+  if (!authenticated()) return;
   if (webserver.method() == HTTP_POST) {
     Preferences p;
     p.begin(PREF_NAMESPACE_BACKDOOR, false);
@@ -91,7 +91,7 @@ void Backdoor::uri_handler() {
     <h2>ESP Backdoor Configuration</h2>
     <p>Please note! You SHOULD set this to something that only YOU know, before someone else does.
        Once you've set the credentials, the only way to change them again is to either authenticate
-       with them (or the admin account) first, or to erase the NVS.</p>
+       with them first, or to erase the NVS.</p>
     <form name='admin' method='POST' enctype='multipart/form-data' id='admin-form'>
       <table border=0>
         <tr><td align='right'>Backdoor username</td><td><input type='text' name='username' value='[@USER]' size=32 /></td></tr>

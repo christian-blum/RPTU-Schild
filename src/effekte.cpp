@@ -22,11 +22,11 @@ struct sCRGBA ls_credits_hintergrundfarbe = { .x = 0xfc000000 };
 struct sCRGBA ls_credits_schriftfarbe = { .x = 0xfc00c000 };
 
 Effekt_Laufschrift effekt_laufschrift_releaseInfo(false, true, 100, releaseInfo, 25, 70, ls_releaseInfo_schriftfarbe, ls_releaseInfo_hintergrundfarbe);
-Effekt_Laufschrift effekt_laufschrift_credits(false, true, 100, credits, 8, 70, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
+//Effekt_Laufschrift effekt_laufschrift_credits(false, true, 100, credits, 8, 70, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
 Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
 
-std::array<Effekt *, 1> effekte_prototypen = {
-//  &effekt_laufschrift_releaseInfo,
+std::array<Effekt *, 2> effekte_prototypen = {
+  &effekt_laufschrift_releaseInfo,
 //  &effekt_laufschrift_credits,
   &effekt_smiley_grinsend,
 };
@@ -101,7 +101,8 @@ void effekte_pipeline_fuellen() {
   if (!effekt_laufend) {
     if (!effekte_einaus) return;
     effekt_schedule_pause(random(effekt_pause_max - effekt_pause_min) + effekt_pause_min);
-    effekt_laufend = effekt_wuerfeln();
+    //effekt_laufend = effekt_wuerfeln();
+    effekt_laufend = effekte[1];
   }
   while (effekt_pipeline_laenge < EFFEKTE_PIPELINE_MAXIMALLAENGE && effekt_laufend) {
     bool abgeschlossen = effekt_laufend->doit(); // dann rufen wir die Funktion mal auf...

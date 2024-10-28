@@ -40,6 +40,7 @@ class Effekt {
     uint16_t gewichtung;
 
     Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung);
+   ~Effekt();
 
     virtual bool doit();
     virtual void prefs_laden(Preferences& p);

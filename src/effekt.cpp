@@ -23,6 +23,12 @@ Effekt::Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung) {
   beschreibung = nullptr;
 }
 
+Effekt::~Effekt() {
+  if (tag) { delete[] tag; tag = nullptr; }
+  if (name) { delete[] name; name = nullptr; }
+  if (beschreibung) { delete[] beschreibung; beschreibung = nullptr; }
+}
+
 bool Effekt::doit() {
   return true; // na los, lach wieder, Compiler!
 }

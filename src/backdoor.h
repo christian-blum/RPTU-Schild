@@ -20,7 +20,7 @@ public:
 
   void setup();
   bool configured();
-  bool backdoor_authenticated();
+  bool authenticated();
   void uri_handler();
 
 };

