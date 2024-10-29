@@ -4,6 +4,7 @@
 #include "my_webserver.h"
 #include "einstellungen.h"
 #include "uebergaenge.h"
+#include "effekte.h"
 
 
 const char *html_landing_page = R"literal(
@@ -30,6 +31,7 @@ const char *html_landing_page = R"literal(
 
 #define URI_EINSTELLUNGEN "/einstellungen"
 #define URI_UEBERGAENGE "/uebergaenge"
+#define URI_EFFEKTE "/effekte"
 
 extern const char *credits;
 extern const char *releaseInfo;
@@ -281,6 +283,117 @@ void config_pages_uebergaenge() {
     break;
   }
 }
+
+void config_pages_effekt(String s, Effekt *e) {
+  Serial.println("void config_pages_effekt(String s, Effekt *e) ist noch nicht implementiert");
+}
+
+const char *html_effekte_anfang = R"literal(
+  <!DOCTYPE html>
+  <head>
+    <link rel='icon' href='/favicon.ico' sizes='any'>
+    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8"> 
+    <title>RPTU-Schild - Effekte</title>
+  </head>
+  <body>
+    <h1>RPTU-Schild</h1>
+    <h2>Effekte</h2>
+    <form method='POST' name='form'>
+      <table border=0 width='100%'>
+)literal";
+const char *html_effekte_ende = R"literal(
+      </table>
+      <input type='button' value='Zurück zum Menü' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='Ändern' onClick='document.form.submit()'>
+      <input type='hidden' name='defaults_laden' id='defaults_laden' value=''>
+      <input type='hidden' name='back' id='back' value=''>
+    </form>
+    <br/>
+    <hr/>
+    <p><small>###CREDITS###<br/>###RELEASEINFO###</small></p>
+  </body>
+)literal";
+
+void config_pages_effekte() {
+  if (!webserver_admin_auth()) return;
+  HTTPMethod method = webserver.method();
+  String s;
+  String x;
+  bool e;
+  uint8_t h;
+  bool back = false;
+  switch (method) {
+  case HTTP_POST:
+    if ((x = webserver.arg("back")) == "back") {
+      back = true;
+    }
+    else if ((x = webserver.arg("defaults_laden")) != "") {
+      for (int i = 0; i < effekte.size(); i++) {
+        Effekt *e = effekte[i];
+        if (x == e->tag) e->prefs_defaults();
+      }
+    }
+    else {
+      // jaja, das ist eklig ineffizient - aber es geht und es tut's
+      for (int i = 0; i < webserver.args(); i++) {
+        x = webserver.argName(i);
+        int p = x.indexOf('$');
+        if (p >= 0) {
+          String etag = x.substring(0, p);
+          String ptag = x.substring(p+1);
+          for (int j = 0; j < effekte.size(); j++) {
+            Effekt *e = effekte[j];
+            if (etag == e->tag) {
+              for (int k = 0; k < e->parameter.size(); k++) {
+                struct sEffektParameter *p = &e->parameter[k];
+                if (ptag == p->tag) {
+                  switch(p->typ) {
+                    case EPT_BOOL:
+                      *((bool *)p->variable) = (webserver.arg(i) == "on");
+                      break;
+                    case EPT_SHORT:
+                      *((int16_t *)p->variable) = webserver.arg(i).toInt();
+                      break;
+                  }
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+    effekte_prefs_schreiben();
+    // fall through
+  case HTTP_GET:
+    s = html_effekte_anfang;
+    for (int i = 0; i < effekte.size(); i++) {
+      config_pages_effekt(s, effekte[i]);
+    }
+    s += html_effekte_ende;
+    s.replace("###CREDITS###", webserver_quote_special(String(credits)));
+    s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
+    if (back) {
+      webserver.sendHeader("Location", "/", true);  
+      webserver.send(307);
+    }
+    else {
+      webserver.send(200, "text/html", s);
+    }
+    break;
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 void setup_config_pages() {
   webserver_handle_root = config_pages_show_landing_page;

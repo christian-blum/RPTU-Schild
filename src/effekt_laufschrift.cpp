@@ -6,13 +6,18 @@ static inline uint32_t rotateLeft(uint32_t x, int n) {
 }
 
 
-Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung) : Effekt(loeschbar, aktiv, gewichtung) {
+
+Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) : Effekt(loeschbar, aktiv, gewichtung) {
   text = nullptr;
   zeichenzahl = 0;
   count_ende = 0;
-}
 
-Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) : Effekt_Laufschrift(loeschbar, aktiv, gewichtung) {
+  parameter.push_back(P_YPOS);
+  parameter.push_back(P_MILLIS);
+  parameter.push_back(P_SF);
+  parameter.push_back(P_HF);
+  parameter.push_back(P_TEXT);
+
   uint32_t x = 0;
   for (const char *c = anzeigetext; *c; c++) {
     x = rotateLeft(x, 1) ^ (const unsigned char) *c; 

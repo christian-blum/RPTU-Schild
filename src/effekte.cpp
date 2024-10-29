@@ -118,3 +118,7 @@ void setup_effekte() {
   }
 }
 
+
+void effekte_prefs_schreiben() {
+  Serial.println("effekte_prefs_schreiben() ist noch nicht implementiert");
+}

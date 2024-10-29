@@ -18,6 +18,9 @@ Effekt::Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung) {
   Effekt::aktiv = Effekt::default_aktiv = aktiv;
   Effekt::gewichtung = Effekt::default_gewichtung = gewichtung;
 
+  parameter.push_back(P_AKTIV);
+  parameter.push_back(P_GEWICHTUNG);
+
   tag = nullptr;
   name = nullptr;
   beschreibung = nullptr;

@@ -9,8 +9,12 @@
 #define EFFEKTE_PIPELINE_MINDESTLAENGE 2
 #define EFFEKTE_PIPELINE_MAXIMALLAENGE 5
 
+extern std::vector<Effekt *> effekte;
+
 void effekte_pipeline_fuellen();
 void effekte_gewichtungen_summieren();
 void setup_effekte();
+void effekte_prefs_schreiben();
+
 
 #endif

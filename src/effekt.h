@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include <vector>
 
 extern uint16_t effekt_pipeline_laenge;
 extern struct sBitmap *effekt_pipelineHead;
@@ -24,9 +25,28 @@ struct sBitmap *effekt_dequeue();
 
 #define PREF_AUSGEBEN(s, t, v) s += tag; s += "."; s += t; s += "="; s += v; s += "\n"
 
+enum eEffektParameterTyp {
+  EPT_BOOL,
+  EPT_SHORT,
+  EPT_USHORT,
+  EPT_RGBA,
+  EPT_TEXT,
+};
+
+struct sEffektParameter {
+  const char *tag;
+  const char *name;
+  const enum eEffektParameterTyp typ;
+  const uint8_t laenge;
+  const char *einheit;
+  const void *variable;
+};
+
 
 class Effekt {
   private:
+    const struct sEffektParameter P_AKTIV = { "aktiv", "Aktiv", EPT_BOOL, 0, nullptr, (void *) &aktiv };
+    const struct sEffektParameter P_GEWICHTUNG = { "gewichtung", "Gewichtung", EPT_USHORT, 5, nullptr, (void *) &gewichtung };
 
   public:
 
@@ -38,6 +58,8 @@ class Effekt {
     bool aktiv;
     uint16_t default_gewichtung;
     uint16_t gewichtung;
+
+    std::vector<sEffektParameter> parameter;
 
     Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung);
    ~Effekt();
