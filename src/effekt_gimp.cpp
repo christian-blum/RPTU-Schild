@@ -21,7 +21,9 @@ Effekt_GIMP::Effekt_GIMP(bool loeschbar, bool aktiv, uint16_t gewichtung, const 
   char *buffer = new char[12];
   sprintf(buffer, "eg_%8.8x", x);
   tag = buffer;
-  name = artwork->comment;
+  buffer = new char[strlen(artwork->comment)+1];
+  strcpy(buffer, artwork->comment);
+  name = buffer;
   String b;
   b += "Zeigt sporadisch die Grafik \"";
   b += artwork->comment;

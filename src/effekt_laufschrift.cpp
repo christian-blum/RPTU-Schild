@@ -35,11 +35,11 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   Effekt_Laufschrift::hintergrundfarbe = Effekt_Laufschrift::default_hintergrundfarbe = hintergrundfarbe;
   Effekt_Laufschrift::ypos = Effekt_Laufschrift::default_ypos = ypos;
   int l = strlen(anzeigetext)+1;
-  char *dat = new char[strlen(anzeigetext)+1];
-  memcpy(dat, anzeigetext, l);
+  char *dat = new char[l];
+  strcpy(dat, anzeigetext);
   Effekt_Laufschrift::default_anzeigetext = dat;
-  char *at = new char[strlen(anzeigetext)+1];
-  memcpy(at, default_anzeigetext, strlen(default_anzeigetext)+1);
+  char *at = new char[l];
+  strcpy(at, anzeigetext);
   Effekt_Laufschrift::anzeigetext = at;
   text_padding();
 }
