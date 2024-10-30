@@ -29,14 +29,11 @@ Effekt_GIMP::Effekt_GIMP(bool loeschbar, bool aktiv, uint16_t gewichtung, const 
   b += artwork->comment;
   b += "\" an.";
   buffer = new char[b.length()+1];
-  memcpy(buffer, b.c_str(), b.length());
-  buffer[b.length()] = '\0';
+  strcpy(buffer, b.c_str());
   beschreibung = buffer;
 }
 
 Effekt_GIMP::~Effekt_GIMP() {
-  if (tag) { delete[] tag; tag = nullptr; }
-  if (beschreibung) { delete[] beschreibung; beschreibung = nullptr; }
 }
 
 bool Effekt_GIMP::doit() {

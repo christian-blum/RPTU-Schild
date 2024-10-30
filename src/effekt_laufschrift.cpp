@@ -25,10 +25,13 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   char *_tag = new char[12];
   sprintf(_tag, "el_%8.8x", x);
   tag = _tag;
-  char *_name = new char[22];
+  char *_name = new char[21];
   sprintf(_name, "Laufschrift %8.8x", x);
   name = _name;
-  beschreibung = "Zeigt sporadisch eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Umlaute Ä, Ö und Ü sowie ß sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
+  const char *_beschreibung = "Zeigt sporadisch eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Umlaute Ä, Ö und Ü sowie ß sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
+  char *__beschreibung = new char[strlen(_beschreibung)+1];
+  strcpy(__beschreibung, _beschreibung);
+  Effekt_Laufschrift::beschreibung = __beschreibung;
 
   Effekt_Laufschrift::millis = Effekt_Laufschrift::default_millis = millis;
   Effekt_Laufschrift::schriftfarbe = Effekt_Laufschrift::default_schriftfarbe = schriftfarbe;
