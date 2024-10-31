@@ -302,13 +302,6 @@ void config_pages_uebergaenge() {
   }
 }
 
-void neue_laufschrift_hinzufuegen() {
-  Serial.println("neue_laufschrift_hinzufuegen() ist noch nicht implementiert");
-}
-
-void effekt_loeschen(String etag) {
-  Serial.println("effekt_loeschen() ist noch nicht implementiert");
-}
 
 void config_pages_effekt(String &s, Effekt *e) {
   String l;
@@ -383,7 +376,7 @@ void config_pages_effekt(String &s, Effekt *e) {
   if (e->loeschbar) {
     s += "<br/><input type='button' onclick='document.getElementById(\"loeschen\").value=\"";
     s += e->tag;
-    s += "\"; document.form.submit()' value='Löschen'>";
+    s += "\"; document.form.submit()' value='L&ouml;schen'>";
   }
   s += "</td></tr>\n";
   s.replace("###LANG###", l);
@@ -410,6 +403,7 @@ const char *html_effekte_ende = R"literal(
       <input type='hidden' name='defaults_laden' id='defaults_laden' value=''>
       <input type='hidden' name='back' id='back' value=''>
       <input type='hidden' name='neue_laufschrift' id='neue_laufschrift' value=''>
+      <input type='hidden' name='loeschen' id='loeschen' value=''>
     </form>
     <br/>
     <hr/>
@@ -431,7 +425,9 @@ void config_pages_effekte() {
       back = true;
     }
     else if ((x = webserver.arg("neue_laufschrift")) == "neu") {
-      neue_laufschrift_hinzufuegen();
+      char buffer[12];
+      sprintf(buffer, "el_%8.8x", random());
+      neue_laufschrift_hinzufuegen(buffer);
     }
     else if ((x = webserver.arg("defaults_laden")) != "") {
       for (int i = 0; i < effekte.size(); i++) {
@@ -477,7 +473,7 @@ void config_pages_effekte() {
                       }
                       break;
                     case EPT_RGBA:
-                      ((struct sCRGBA *)p->variable)->x = strtol(webserver.arg(i).c_str(), NULL, 16);
+                      ((struct sCRGBA *)p->variable)->x = strtoul(webserver.arg(i).c_str(), NULL, 16);
                       break;
                   }
                 }

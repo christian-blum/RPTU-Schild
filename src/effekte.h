@@ -15,6 +15,7 @@ void effekte_pipeline_fuellen();
 void effekte_gewichtungen_summieren();
 void setup_effekte();
 void effekte_prefs_schreiben();
-
+void neue_laufschrift_hinzufuegen(const char *etag);
+void effekt_loeschen(String etag);
 
 #endif

@@ -29,7 +29,7 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   char *_name = new char[strlen(name)+1];
   strcpy(_name, name);
   Effekt::name = _name;
-  const char *_beschreibung = "Zeigt eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Deutsche Umlaute sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
+  const char *_beschreibung = "Zeigt eine Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Deutsche Umlaute sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
   char *__beschreibung = new char[strlen(_beschreibung)+1];
   strcpy(__beschreibung, _beschreibung);
   Effekt_Laufschrift::beschreibung = __beschreibung;

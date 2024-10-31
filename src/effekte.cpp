@@ -10,8 +10,8 @@
 
 #include <vector>
 
-
-
+#define PREF_NAMESPACE_EFFEKTE "effekte"
+#define PREF_EFFEKTE_LAUFSCHRIFTEN "laufschriften"
 
 uint16_t effekt_pipeline_laenge;
 struct sBitmap *effekt_pipelineHead;
@@ -41,7 +41,7 @@ Effekt_Pause effekt_pause;
 void effekte_gewichtungen_summieren() {
   uint32_t sg = 0;
   for (std::vector<Effekt *>::iterator i = effekte.begin(); i < effekte.end(); i++) {
-    sg += (*i)->gewichtung;
+    if ((*i)->aktiv) sg += (*i)->gewichtung;
   }
   effekte_summe_gewichte = sg;
 }
@@ -80,9 +80,11 @@ Effekt *effekt_wuerfeln() {
   int32_t x = random(effekte_summe_gewichte);
   for (int i = 0; i < effekte.size(); i++) {
     Effekt *e = effekte[i];
-    x -= e->gewichtung;
-    if (x < 0) {
-      return e;
+    if (e->aktiv) {
+      x -= e->gewichtung;
+      if (x < 0) {
+        return e;
+      }
     }
   }
   return nullptr;
@@ -116,7 +118,24 @@ void effekte_pipeline_fuellen() {
   }
 }
 
+void effekte_laufschriftliste_speichern() {
+  String s;
+  for (int i = 0; i < effekte.size(); i++) {
+    Effekt *e = effekte[i];
+    if (static_cast<Effekt_Laufschrift*>(e) != nullptr) {
+      if (s.length()) s += '\t';
+      s += e->tag;
+    }
+  }
+  Preferences p;
+  p.begin(PREF_NAMESPACE_EFFEKTE, false);
+  String x = p.getString(PREF_EFFEKTE_LAUFSCHRIFTEN);
+  if (s != x) p.putString(PREF_EFFEKTE_LAUFSCHRIFTEN, s);
+  p.end();
+}
+
 void effekte_prefs_schreiben() {
+  effekte_laufschriftliste_speichern();
   for (int i = 0; i < effekte.size(); i++) {
     effekte[i]->prefs_schreiben();
   }
@@ -130,9 +149,46 @@ void effekte_prefs_laden() {
   effekte_gewichtungen_summieren();
 }
 
+void neue_laufschrift_hinzufuegen(const char *etag) {
+  struct sCRGBA schriftfarbe, hintergrundfarbe;
+  schriftfarbe.r = 0xc0; schriftfarbe.g = 0x00; schriftfarbe.b = 0xc0; schriftfarbe.a = 0xf0;
+  hintergrundfarbe.r = 0x00; hintergrundfarbe.g = 0x00; hintergrundfarbe.b = 0x10; hintergrundfarbe.a = 0xf0;
+  Effekt_Laufschrift *el = new Effekt_Laufschrift(true, false, 100, etag, "Benutzerdefinierte Laufschrift", "Hier k\xf6nnte deine Botschaft stehen.", 0, 50, schriftfarbe, hintergrundfarbe);
+  effekt_hinzufuegen(el);
+}
+
+void effekt_loeschen(String etag) {
+  for (std::vector<Effekt *>::iterator i = effekte.begin(); i < effekte.end(); i++) {
+    if (etag == (*i)->tag) {
+      effekte.erase(i);
+      break;
+    }
+  }
+}
+
 void setup_effekte() {
   for (int i = 0; i < effekte_prototypen.size(); i++) {
     effekt_hinzufuegen(effekte_prototypen[i]);
   }
+  Preferences p;
+  p.begin(PREF_NAMESPACE_EFFEKTE, true);
+  if (p.isKey(PREF_EFFEKTE_LAUFSCHRIFTEN)) {
+    String x = p.getString(PREF_EFFEKTE_LAUFSCHRIFTEN);
+    char buffer[x.length()+1];
+    strcpy(buffer, x.c_str());
+    char *etag = strtok(buffer, "\t");
+    while (etag) {
+      // nachsehen, ob der Effekt existiert
+      bool gefunden = false;
+      for (int i = 0; i < effekte.size(); i++) {
+        if (!strcmp(etag, effekte[i]->tag)) { gefunden = true; break; }
+      }
+      if (!gefunden) {
+        neue_laufschrift_hinzufuegen(etag);
+      }
+      etag = strtok(NULL, "\t");
+    }
+  }
+  p.end();
   effekte_prefs_laden();
 }
