@@ -302,6 +302,14 @@ void config_pages_uebergaenge() {
   }
 }
 
+void neue_laufschrift_hinzufuegen() {
+  Serial.println("neue_laufschrift_hinzufuegen() ist noch nicht implementiert");
+}
+
+void effekt_loeschen(String etag) {
+  Serial.println("effekt_loeschen() ist noch nicht implementiert");
+}
+
 void config_pages_effekt(String &s, Effekt *e) {
   String l;
   s += "<tr><td valign='top'><b>";
@@ -371,7 +379,13 @@ void config_pages_effekt(String &s, Effekt *e) {
   }
   s += "</table></td><td  valign='top'><input type='button' onclick='document.getElementById(\"defaults_laden\").value=\"";
   s += e->tag;
-  s += "\"; document.form.submit()' value='Defaults'></td></tr>\n";
+  s += "\"; document.form.submit()' value='Defaults'>";
+  if (e->loeschbar) {
+    s += "<br/><input type='button' onclick='document.getElementById(\"loeschen\").value=\"";
+    s += e->tag;
+    s += "\"; document.form.submit()' value='Löschen'>";
+  }
+  s += "</td></tr>\n";
   s.replace("###LANG###", l);
 }
 
@@ -392,9 +406,10 @@ const char *html_effekte_anfang = R"literal(
 )literal";
 const char *html_effekte_ende = R"literal(
       </table>
-      <input type='button' value='Zur&uuml;ck zum Men&uuml;' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='&Auml;ndern' onClick='document.form.submit()'>
+      <input type='button' value='Zur&uuml;ck zum Men&uuml;' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='&Auml;ndern' onClick='document.form.submit()'>&nbsp;<input type='button' value='Neue Laufschrift' onClick='document.getElementById("neue_laufschrift").value="neu"; document.form.submit()'>
       <input type='hidden' name='defaults_laden' id='defaults_laden' value=''>
       <input type='hidden' name='back' id='back' value=''>
+      <input type='hidden' name='neue_laufschrift' id='neue_laufschrift' value=''>
     </form>
     <br/>
     <hr/>
@@ -415,11 +430,17 @@ void config_pages_effekte() {
     if ((x = webserver.arg("back")) == "back") {
       back = true;
     }
+    else if ((x = webserver.arg("neue_laufschrift")) == "neu") {
+      neue_laufschrift_hinzufuegen();
+    }
     else if ((x = webserver.arg("defaults_laden")) != "") {
       for (int i = 0; i < effekte.size(); i++) {
         Effekt *e = effekte[i];
         if (x == e->tag) e->prefs_defaults();
       }
+    }
+    else if ((x = webserver.arg("loeschen")) != "") {
+      effekt_loeschen(x);
     }
     else {
       // jaja, das ist eklig ineffizient - aber es geht und es tut's
