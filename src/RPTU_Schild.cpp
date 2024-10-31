@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "defaults.h"
 #include "backdoor.h"
-
+#include <nvs_flash.h>
 
 #define DEBUG
 
@@ -134,11 +134,8 @@ void show_chip_data() {
 
 void zuruecksetzen() {
   Serial.println("Alles auf Anfang. Alles Gute!");
-#ifdef HAVE_WEBSERVER
-  wifi_clearPreferences();
-  webserver_clearPreferences();
-#endif
-  preferences_loeschen();
+  nvs_flash_erase();      // erase the NVS partition and...
+  nvs_flash_init();       // initialize the NVS partition.
   esp_restart();
 }
 
