@@ -29,6 +29,7 @@ enum eEffektParameterTyp {
   EPT_BOOL,
   EPT_SHORT,
   EPT_USHORT,
+  EPT_FLOAT,
   EPT_RGBA,
   EPT_TEXT,
 };

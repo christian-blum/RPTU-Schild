@@ -87,6 +87,7 @@ Effekt *effekt_wuerfeln() {
     Effekt *e = effekte[i];
     x -= e->gewichtung;
     if (x < 0) {
+      Serial.println("Gewürfelter Effekt:"); Serial.println(e->name);
       return e;
     }
   }
@@ -102,14 +103,13 @@ void effekte_pipeline_fuellen() {
   if (effekt_pipeline_laenge >= EFFEKTE_PIPELINE_MINDESTLAENGE) return;  // wir haben genug auf Halde.
   if (!effekt_laufend) {
     if (!effekte_einaus) return;
-    effekt_schedule_pause(random(effekt_pause_max - effekt_pause_min) + effekt_pause_min);
     effekt_laufend = effekt_wuerfeln();
-    effekt_laufend = effekte[1];
   }
   while (effekt_pipeline_laenge < EFFEKTE_PIPELINE_MAXIMALLAENGE && effekt_laufend) {
     bool abgeschlossen = effekt_laufend->doit();
     if (abgeschlossen) {
       effekt_laufend = nullptr;
+      effekt_schedule_pause(random(effekt_pause_max - effekt_pause_min) + effekt_pause_min);
     }
   }
 }

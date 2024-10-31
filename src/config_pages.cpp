@@ -266,26 +266,87 @@ void config_pages_uebergaenge() {
     uebergaenge_prefs_schreiben();
     // fall through
   case HTTP_GET:
-    s = html_uebergaenge_anfang;
-    for (int i = 0; i < uebergaenge.size(); i++) {
-      config_pages_uebergang(s, uebergaenge[i]);
-    }
-    s += html_uebergaenge_ende;
-    s.replace("###CREDITS###", webserver_quote_special(String(credits)));
-    s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
     if (back) {
       webserver.sendHeader("Location", "/", true);  
       webserver.send(307);
     }
     else {
+      s = html_uebergaenge_anfang;
+      for (int i = 0; i < uebergaenge.size(); i++) {
+        config_pages_uebergang(s, uebergaenge[i]);
+      }
+      s += html_uebergaenge_ende;
+      s.replace("###CREDITS###", webserver_quote_special(String(credits)));
+      s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
       webserver.send(200, "text/html", s);
     }
     break;
   }
 }
 
-void config_pages_effekt(String s, Effekt *e) {
-  Serial.println("void config_pages_effekt(String s, Effekt *e) ist noch nicht implementiert");
+void config_pages_effekt(String &s, Effekt *e) {
+  String l;
+  s += "<tr><td valign='top'><b>";
+  s += webserver_quote_special(e->name);
+  s += "</b><br/><small>";
+  s += webserver_quote_special(e->beschreibung);
+  s += "</small><br/>###LANG###</td><td align='left' valign='top'>";
+  s += "<table border=0 width='100%'>";
+  for (int i = 0; i < e->parameter.size(); i++) {
+    struct sEffektParameter *p = &e->parameter[i];
+    if (p->typ != EPT_TEXT) {
+      s += "<tr><td align='right'>";
+      s += webserver_quote_special(p->name);
+      s += ":</td><td><span style='white-space: nowrap;'>";
+    }
+    String _tag = e->tag;
+    _tag += "$";
+    _tag += p->tag;
+    switch (p->typ) {
+      case EPT_TEXT:
+        l += "<br/><span style='white-space: nowrap;'>";
+        l += webserver_quote_special(p->name);
+        l += ": <input type=text style='width: 95%;' name='";;
+        l += _tag;
+        l += "' value='";
+        l += webserver_quote_special(*(char **)p->variable);
+        l += "'>";
+        l += "</span>";
+        break;
+      case EPT_BOOL:
+        s += "<input type='hidden' name='";
+        s += _tag;
+        s += "' id='";
+        s += _tag;
+        s += "' value='";
+        s += (*((bool *)p->variable)) ? "on" : "off";
+        s += "'><input type='checkbox' onchange='document.getElementById(\"";
+        s += _tag;
+        s += "\").value = this.checked ? \"on\" : \"off\"'";
+        if (*((bool *)p->variable)) s += " checked";
+        s += ">";
+        break;
+      case EPT_USHORT:
+      case EPT_SHORT:
+      case EPT_FLOAT:
+        s += "<input type='text' size='";
+        s += p->laenge;
+        s += "' name='";
+        s += _tag;
+        s += "' value='";
+        if (p->typ == EPT_USHORT) s += *((uint16_t *)p->variable);
+        else if (p->typ == EPT_SHORT) s += *((int16_t *)p->variable);
+        else if (p->typ == EPT_FLOAT) s += *((float *)p->variable);
+        s += "'>";
+        if (p->einheit) { s += "&nbsp;"; s += webserver_quote_special(p->einheit); } 
+        break;
+    }
+    s += "</span></td></tr>";
+  }
+  s += "</table></td><td  valign='top'><input type='button' onclick='document.getElementById(\"defaults_laden\").value=\"";
+  s += e->tag;
+  s += "\"; document.form.submit()' value='Defaults'></td></tr>\n";
+  s.replace("###LANG###", l);
 }
 
 const char *html_effekte_anfang = R"literal(
@@ -367,18 +428,18 @@ void config_pages_effekte() {
     effekte_prefs_schreiben();
     // fall through
   case HTTP_GET:
-    s = html_effekte_anfang;
-    for (int i = 0; i < effekte.size(); i++) {
-      config_pages_effekt(s, effekte[i]);
-    }
-    s += html_effekte_ende;
-    s.replace("###CREDITS###", webserver_quote_special(String(credits)));
-    s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
     if (back) {
       webserver.sendHeader("Location", "/", true);  
       webserver.send(307);
     }
     else {
+      s = html_effekte_anfang;
+      for (int i = 0; i < effekte.size(); i++) {
+        config_pages_effekt(s, effekte[i]);
+      }
+      s += html_effekte_ende;
+      s.replace("###CREDITS###", webserver_quote_special(String(credits)));
+      s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
       webserver.send(200, "text/html", s);
     }
     break;
@@ -399,4 +460,5 @@ void setup_config_pages() {
   webserver_handle_root = config_pages_show_landing_page;
   webserver.on(URI_EINSTELLUNGEN, config_pages_einstellungen);
   webserver.on(URI_UEBERGAENGE, config_pages_uebergaenge);
+  webserver.on(URI_EFFEKTE, config_pages_effekte);
 }
