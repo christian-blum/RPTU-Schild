@@ -26,7 +26,6 @@ class Effekt_Laufschrift : public Effekt {
     uint16_t zeichenzahl;
     uint16_t count; // zählt bis 6x Zeichenzahl
     uint16_t count_ende;
-    volatile bool semaphore;  // brauche ich die?
     char textfragment[LAUFSCHRIFT_TEXTFRAGMENT_GROESSE];
 
     void text_padding();
