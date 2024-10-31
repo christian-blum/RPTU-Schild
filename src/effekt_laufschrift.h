@@ -47,6 +47,7 @@ class Effekt_Laufschrift : public Effekt {
     uint16_t default_millis;
     uint16_t millis; // pro Schritt nach links
 
+    void neuer_text(const char *anzeigetext);
     void neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe);
     bool doit() override;
     void prefs_laden(Preferences& p) override;

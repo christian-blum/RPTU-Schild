@@ -5,6 +5,7 @@
 #include "einstellungen.h"
 #include "uebergaenge.h"
 #include "effekte.h"
+#include "effekt_laufschrift.h"
 
 
 const char *html_landing_page = R"literal(
@@ -415,6 +416,19 @@ void config_pages_effekte() {
                       break;
                     case EPT_SHORT:
                       *((int16_t *)p->variable) = webserver.arg(i).toInt();
+                      break;
+                    case EPT_USHORT:
+                      *((uint16_t *)p->variable) = webserver.arg(i).toInt();
+                      break;
+                    case EPT_FLOAT:
+                      *((float *)p->variable) = webserver.arg(i).toFloat();
+                      break;
+                    case EPT_TEXT:
+                      if (static_cast<Effekt_Laufschrift*>(e) != nullptr) {
+                        if (!strcmp("text", p->tag)) {
+                          ((Effekt_Laufschrift *)e)->neuer_text(webserver.arg(i).c_str());
+                        }
+                      }
                       break;
                   }
                 }

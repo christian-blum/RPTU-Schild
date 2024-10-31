@@ -67,11 +67,15 @@ void Effekt_Laufschrift::text_padding() {
   count_ende = (zeichenzahl - (LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2)) * TEXT_5X7_SPALTEN_PRO_ZEICHEN;
 }
 
-void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) {
+void Effekt_Laufschrift::neuer_text(const char *anzeigetext) {
   char *at = new char[strlen(anzeigetext)+1];
   memcpy(at, anzeigetext, strlen(anzeigetext)+1);
   if (Effekt_Laufschrift::anzeigetext) delete[] Effekt_Laufschrift::anzeigetext; // bitte Reihenfolge so lassen, das ist narrensicher (z.B. Aufruf mit Pointer auf alten Heap-Text)
   Effekt_Laufschrift::anzeigetext = at;
+}
+
+void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) {
+  neuer_text(anzeigetext);
   Effekt_Laufschrift::ypos = ypos;
   Effekt_Laufschrift::millis = millis;
   Effekt_Laufschrift::schriftfarbe = schriftfarbe;

@@ -6,6 +6,7 @@
 #include "gimp_smiley_grinsend.h"
 #include "effekt_gimp.h"
 #include "effekt_laufschrift.h"
+#include "effekt_pause.h"
 
 #include <vector>
 
@@ -34,6 +35,8 @@ std::array<Effekt *, 3> effekte_prototypen = {
 std::vector<Effekt *> effekte;
 uint32_t effekte_summe_gewichte;
 Effekt *effekt_laufend;
+
+Effekt_Pause effekt_pause;
 
 void effekte_gewichtungen_summieren() {
   uint32_t sg = 0;
@@ -72,14 +75,6 @@ void effekt_queue_bitmap(struct sBitmap *effekt) {
   }
 }
 
-void effekt_schedule_pause(uint32_t milliseconds) {
-  struct sBitmap *b = (struct sBitmap *) malloc(sizeof(struct sBitmap));
-  memset(b, 0, sizeof(struct sBitmap));
-  b->bitmap = NULL;
-  b->milliseconds = milliseconds;
-  effekt_queue_bitmap(b);
-}
-
 Effekt *effekt_wuerfeln() {
   if (!effekte_summe_gewichte) return nullptr;
   int32_t x = random(effekte_summe_gewichte);
@@ -98,18 +93,26 @@ void effekte_setze_laufender_effekt(int welcher) {
     effekt_laufend = effekte[welcher];
 }
 
+bool wuerfeln = false;
+
 void effekte_pipeline_fuellen() {
   //  if (!einaus) return;  // Wenn das Schild gerade nicht an ist, brauchen auch keine Effekte erzeugt zu werden.
   if (effekt_pipeline_laenge >= EFFEKTE_PIPELINE_MINDESTLAENGE) return;  // wir haben genug auf Halde.
-  if (!effekt_laufend) {
+  if (!effekt_laufend && wuerfeln) {
     if (!effekte_einaus) return;
     effekt_laufend = effekt_wuerfeln();
+    wuerfeln = false;
   }
   while (effekt_pipeline_laenge < EFFEKTE_PIPELINE_MAXIMALLAENGE && effekt_laufend) {
     bool abgeschlossen = effekt_laufend->doit();
     if (abgeschlossen) {
-      effekt_laufend = nullptr;
-      effekt_schedule_pause(random(effekt_pause_max - effekt_pause_min) + effekt_pause_min);
+      if (!wuerfeln) {
+        effekt_laufend = &effekt_pause;
+        wuerfeln = true;
+      }
+      else {
+        effekt_laufend = nullptr;
+      }
     }
   }
 }
