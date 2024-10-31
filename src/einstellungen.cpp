@@ -76,7 +76,6 @@ void preferences_laden() {
 
 void preferences_schreiben() {
   Preferences p;
-  Serial.println("preferences_schreiben()");
   if (p.begin(PREF_NAMESPACE_ALLGEMEIN, false)) {
     if (p.getBool(PREF_EINAUS) != einaus) p.putBool(PREF_EINAUS, einaus);
     if (p.getUChar(PREF_HELLIGKEIT) != helligkeit) p.putUChar(PREF_HELLIGKEIT, helligkeit);
