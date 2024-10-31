@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Preferences.h>
 
+#include "effekte.h"
 #include "effekt.h"
 #include "led_matrix.h"
 #include "text_5x7.h"
@@ -8,219 +9,66 @@
 #include "einstellungen.h"
 #include "gimp_artwork.h"
 #include "cb_scheduler.h"
-
-#define PREF_NAMESPACE_EFFEKTE "effekte"
-
-// jede braucht locker 3 kB RAM, also Vorsicht. Zu kurz kann zu Ruckeln führen, zu lang bringt nichts außer Speicherverbrauch.
-#define EFFEKTE_PIPELINE_MINDESTLAENGE 2
-#define EFFEKTE_PIPELINE_MAXIMALLAENGE 5
-
-
-uint16_t effekt_pipeline_laenge;
-struct sBitmap *effekt_pipelineHead;
-struct sBitmap *effekt_pipelineTail;
+#include "gimp_smiley_grinsend.h"
 
 
 
+Effekt::Effekt(bool loeschbar, bool aktiv, uint16_t gewichtung) {
+  Effekt::loeschbar = loeschbar;
+  Effekt::aktiv = Effekt::default_aktiv = aktiv;
+  Effekt::gewichtung = Effekt::default_gewichtung = gewichtung;
 
+  parameter.push_back(P_AKTIV);
+  parameter.push_back(P_GEWICHTUNG);
 
-
-void effekt_queue(struct sBitmap *effekt) {
-  if (effekt_pipelineHead == NULL) {
-    effekt_pipelineHead = effekt;
-    effekt_pipelineTail = effekt;
-    semaphore_naechstesEffektLayerAnzeigen = true;
-    effekt_pipeline_laenge = 1;
-  }
-  else {
-    effekt_pipelineTail->naechste = effekt;
-    effekt_pipelineTail = effekt;
-    effekt_pipeline_laenge++;
-  }
+  tag = nullptr;
+  name = nullptr;
+  beschreibung = nullptr;
 }
 
-
-
-
-struct sLaufschrift *els;
-
-
-bool effekt_laufschrift() {
-  bool fertig = laufschrift_rendern(els);
-  if (fertig) {
-    free(els);
-    els = NULL;
-  }
-  return fertig;
+Effekt::~Effekt() {
+  if (tag) { delete[] tag; tag = nullptr; }
+  if (name) { delete[] name; name = nullptr; }
+  if (beschreibung) { delete[] beschreibung; beschreibung = nullptr; }
 }
 
-
-
-
-bool effekt_laufschrift_credits() {
-  if (!els) {
-    els = (struct sLaufschrift *) malloc(sizeof(struct sLaufschrift));
-    memset(els, 0, sizeof(sLaufschrift));
-    els->text = credits;
-    els->y = (LED_COUNT_Y - 7) / 2;
-    els->schriftfarbe.x = LAUFSCHRIFT_CREDITS_SCHRIFTFARBE;
-    els->hintergrundfarbe.x = LAUFSCHRIFT_CREDITS_HINTERGRUNDFARBE;
-    els->millis = laufschrift_delay;
-  }
-  return effekt_laufschrift();
+bool Effekt::doit() {
+  return true; // na los, lach wieder, Compiler!
 }
 
-bool effekt_laufschrift_releaseInfo() {
-  if (!els) {
-    els = (struct sLaufschrift *) malloc(sizeof(struct sLaufschrift));
-    memset(els, 0, sizeof(struct sLaufschrift));
-    els->text = releaseInfo;
-    els->y = (LED_COUNT_Y - 7);
-    els->schriftfarbe.x = LAUFSCHRIFT_RELEASEINFO_SCHRIFTFARBE;
-    els->hintergrundfarbe.x = LAUFSCHRIFT_RELEASEINFO_HINTERGRUNDFARBE;
-    els->millis = laufschrift_delay;
-  }
-  return effekt_laufschrift();
+void Effekt::prefs_laden(Preferences& p) {
+  aktiv = p.getBool(PREF_AKTIV, aktiv);
+  gewichtung = p.getUShort(PREF_GEWICHTUNG, gewichtung);
 }
 
-
-
-
-
-void effekt_schedule_pause(uint32_t milliseconds) {
-  struct sBitmap *b = (struct sBitmap *) malloc(sizeof(struct sBitmap));
-  memset(b, 0, sizeof(struct sBitmap));
-  b->bitmap = NULL;
-  b->milliseconds = milliseconds;
-  effekt_queue(b);
+void Effekt::prefs_laden() {
+  Preferences p;
+  p.begin(tag, true);
+  prefs_laden(p);
+  p.end();
 }
 
-
-bool effekt_bild(const struct sGIMP *welcher) {
-  struct sBitmap *b = (struct sBitmap *) malloc(sizeof(struct sBitmap));
-  memset(b, 0, sizeof(struct sBitmap));
-  struct sCRGBA *bitmap = (struct sCRGBA *) calloc(LED_COUNT, sizeof(struct sCRGBA));
-  memset(bitmap, 0, sizeof(struct sCRGBA) * LED_COUNT);
-  gimp_rendern(bitmap, welcher, LED_COUNT_X / 2, LED_COUNT_Y / 2, REFPUNKT_MITTE, 192);
-  b->bitmap = bitmap;
-  uint32_t milliseconds = 5000;
-  b->milliseconds = milliseconds;
-  effekt_queue(b);
-  return true;
+void Effekt::prefs_schreiben(Preferences& p) {
+  if (p.getBool(PREF_AKTIV) != aktiv) p.putBool(PREF_AKTIV, aktiv);
+  if (p.getUShort(PREF_GEWICHTUNG) != gewichtung) p.putUShort(PREF_GEWICHTUNG, gewichtung);
 }
 
-static const struct sGIMP gimp_smiley_grinsend = {
-    24, 24, 4,
-  "Created with GIMP",
-  "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\355\301\002+\355\301"
-  "\002z\355\301\002\271\355\301\002\344\355\301\002\373\355\301\002\373\355\301\002\344"
-  "\355\301\002\271\355\301\002z\355\301\002+\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\355\301\002\063"
-  "\355\301\002\241\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\241\355\301\002\063\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\355\301\002k\355\301\002\345\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\345\355\301\002k\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\000\000\000\000\000\355\301\002|\355\301\002\376\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\376\355\301\002|\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\000\000\355\301\002k\355\301\002\376\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\376\355\301\002k\000\000\000\000\000\000\000"
-  "\000\000\000\000\000\355\301\002\063\355\301\002\345\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\345\355\301\002\063\000\000\000\000\000\000\000\000\355\301\002\241\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\017\016\016\377\017\016\016\377\017\016\016\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\017\016\016\377\017\016\016\377\017\016\016\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\241\000\000\000\000\355\301\002+\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\017\016\016\377\017\016\016\377"
-  "\017\016\016\377\017\016\016\377\017\016\016\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\017\016\016\377\017\016\016\377\017\016\016\377\017\016\016\377"
-  "\017\016\016\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002+\355\301\002z\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002z\355\301\002\271\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\271\355\301\002\344\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\344\355\301\002\373\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\373\355\301\002\373\355\301\002\377\355\301\002\377\225\005A\377"
-  "\225\005A\377\373\360\360\377\373\360\360\377\353\311\362\377\373\360\360\377"
-  "\373\360\360\377\373\360\360\377\356\336\361\377\356\336\361\377\373\360"
-  "\360\377\373\360\360\377\373\360\360\377\353\311\362\377\373\360\360\377"
-  "\373\360\360\377\225\005A\377\225\005A\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\373\355\301\002\344\355\301\002\377\355\301\002\377\355\301\002\377\225\005A\377"
-  "\373\360\360\377\373\360\360\377\353\311\362\377\373\360\360\377\373\360"
-  "\360\377\373\360\360\377\356\336\361\377\356\336\361\377\373\360\360\377"
-  "\373\360\360\377\373\360\360\377\353\311\362\377\373\360\360\377\373\360"
-  "\360\377\225\005A\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\344"
-  "\355\301\002\271\355\301\002\377\355\301\002\377\355\301\002\377\225\005A\377\373\360"
-  "\360\377\373\360\360\377\353\311\362\377\373\360\360\377\373\360\360\377"
-  "\373\360\360\377\356\336\361\377\356\336\361\377\373\360\360\377\373\360"
-  "\360\377\373\360\360\377\353\311\362\377\373\360\360\377\373\360\360\377"
-  "\225\005A\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\271\355\301"
-  "\002z\355\301\002\377\355\301\002\377\355\301\002\377\225\005A\377\373\360\360\377"
-  "\373\360\360\377\353\311\362\377\373\360\360\377\373\360\360\377\373\360"
-  "\360\377\356\336\361\377\356\336\361\377\373\360\360\377\373\360\360\377"
-  "\373\360\360\377\353\311\362\377\373\360\360\377\373\360\360\377\225\005A\377"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002z\355\301\002+\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\225\005A\377\225\005A\377\226To\377\226To"
-  "\377\226To\377\226To\377\226To\377\226To\377\226To\377\226To\377\226To\377"
-  "\226To\377\226To\377\226To\377\225\005A\377\225\005A\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002+\000\000\000\000\355\301\002\241\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\225\005A\377\373\360\360\377\373\360\360\377\353\311\362"
-  "\377\373\360\360\377\373\360\360\377\356\336\361\377\356\336\361\377\373"
-  "\360\360\377\373\360\360\377\353\311\362\377\373\360\360\377\373\360\360"
-  "\377\225\005A\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\241\000"
-  "\000\000\000\000\000\000\000\355\301\002\063\355\301\002\345\355\301\002\377\355\301\002\377\355"
-  "\301\002\377\373\360\360\377\373\360\360\377\353\311\362\377\373\360\360\377"
-  "\373\360\360\377\356\336\361\377\356\336\361\377\373\360\360\377\373\360"
-  "\360\377\353\311\362\377\373\360\360\377\373\360\360\377\355\301\002\377\355"
-  "\301\002\377\355\301\002\377\355\301\002\345\355\301\002\063\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\355\301\002k\355\301\002\376\355\301\002\377\355\301\002\377\355\301\002\377\373"
-  "\360\360\377\353\311\362\377\373\360\360\377\373\360\360\377\356\336\361"
-  "\377\356\336\361\377\373\360\360\377\373\360\360\377\353\311\362\377\373"
-  "\360\360\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\376\355"
-  "\301\002k\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\355\301\002|\355\301\002\376"
-  "\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\373\360\360\377"
-  "\373\360\360\377\356\336\361\377\356\336\361\377\373\360\360\377\373\360"
-  "\360\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\376\355\301\002|\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
-  "\355\301\002k\355\301\002\345\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\345\355\301\002k\000"
-  "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\355"
-  "\301\002\063\355\301\002\241\355\301\002\377\355\301\002\377\355\301\002\377\355\301"
-  "\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002\377\355\301\002"
-  "\377\355\301\002\377\355\301\002\241\355\301\002\063\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\355"
-  "\301\002+\355\301\002z\355\301\002\271\355\301\002\344\355\301\002\373\355\301\002\373"
-  "\355\301\002\344\355\301\002\271\355\301\002z\355\301\002+\000\000\000\000\000\000\000\000\000\000\000"
-  "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000",
-};
+void Effekt::prefs_schreiben() {
+  Preferences p;
+  p.begin(tag, false);
+  prefs_schreiben(p);
+  p.end();
+}
 
+void Effekt::prefs_ausgeben(String& s) {
+  PREF_AUSGEBEN(s, PREF_AKTIV, aktiv);
+  PREF_AUSGEBEN(s, PREF_GEWICHTUNG, gewichtung);
+}
 
-
-bool effekt_smiley_grinsend() {
-  return effekt_bild(&gimp_smiley_grinsend);
+void Effekt::prefs_defaults() {
+  aktiv = default_aktiv;
+  gewichtung = default_gewichtung;
+  effekte_gewichtungen_summieren();
 }
 
 
@@ -228,41 +76,11 @@ bool effekt_smiley_grinsend() {
 
 
 
-struct sEffektDef {
-  const char *name;
-  bool aktiv;
-  uint16_t gewichtung;
-  bool (*funktion)();
-};
-
-struct sEffekt {
-  bool aktiv;
-  uint16_t gewichtung;
-  bool (*funktion)();
-};
-
-const struct sEffektDef effekte_defaults[] = {
-  "Laufschrift Version", false,  100, effekt_laufschrift_releaseInfo,  // er wird aber beim Booten getriggert
-  "Laufschrift Credits", true,   100, effekt_laufschrift_credits,
-  "Grinse-Smiley",       true,   200, effekt_smiley_grinsend,
-};
-
-#define EFFEKTE_ANZAHL (sizeof(effekte_defaults) / sizeof(effekte_defaults[0]))
-
-struct sEffekt effekte[EFFEKTE_ANZAHL];
-
-uint32_t effekte_summe_gewichte;
-
-void effekte_gewichtungen_summieren() {
-  effekte_summe_gewichte = 0;
-  for (int i = 0; i < EFFEKTE_ANZAHL; i++) {
-    struct sEffekt *e;
-    e = &effekte[i];
-    if (e->aktiv) effekte_summe_gewichte += e->gewichtung;
-  }
-}
 
 
+
+
+/*
 
 #define EFFEKTE_DELIMITER ";"
 
@@ -321,48 +139,7 @@ void effekte_speichern() {
   p.end();
 }
 
-
-
-void setup_effekte() {
-  effekte_laden();
-}
-
-
-bool (*laufender_effekt)();
-
-
-void effekte_setze_laufender_effekt(int welcher) {
-    laufender_effekt = effekte[welcher].funktion;
-}
-
-// Siehe oben :-) C ist eigentlich noch cooler als Brainfuck.
-bool (*wuerfele_effekt())() {
-  int32_t x = random(effekte_summe_gewichte);
-  struct sEffekt *e;
-  for (int i = 0; i < EFFEKTE_ANZAHL && x >= 0; i++) {
-    e = &effekte[i];
-    if (!e->aktiv) continue;
-    x -= e->gewichtung;
-  }
-  return e ? e->funktion : NULL;
-}
-
-
-void effekt_pipeline_fuellen() {
-  //  if (!einaus) return;  // Wenn das Schild gerade nicht an ist, brauchen auch keine Effekte erzeugt zu werden.
-  if (effekt_pipeline_laenge >= EFFEKTE_PIPELINE_MINDESTLAENGE) return;  // wir haben genug auf Halde.
-  if (laufender_effekt == NULL) {
-    if (!effekte_einaus) return;
-    effekt_schedule_pause(random(effekt_pause_max - effekt_pause_min) + effekt_pause_min);
-    laufender_effekt = wuerfele_effekt();
-  }
-  while (effekt_pipeline_laenge < EFFEKTE_PIPELINE_MAXIMALLAENGE && laufender_effekt != NULL) {
-    bool abgeschlossen = (*laufender_effekt)(); // dann rufen wir die Funktion mal auf...
-    if (abgeschlossen) {
-      laufender_effekt = NULL;
-    }
-  }
-}
+*/
 
 
 
@@ -392,3 +169,4 @@ struct sBitmap *effekt_dequeue() {
   }
   return b;
 }
+

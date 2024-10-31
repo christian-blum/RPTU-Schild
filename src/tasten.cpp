@@ -14,92 +14,113 @@
  *                                                            *
  **************************************************************/
 
-volatile bool semaphore_taste_einaus;
-volatile bool semaphore_taste_dunkler;
-volatile bool semaphore_taste_heller;
-volatile bool semaphore_taste_effekte_ein_aus;
+#define ENTPRELLUNG_MAX 10
+#define ENTPRELLUNG_SCHWELLE 7
 
 
-void ARDUINO_ISR_ATTR ISR_taste_ein_aus() {
-  semaphore_taste_einaus = true;
-}
-
-void ARDUINO_ISR_ATTR ISR_taste_heller() {
-  if (!einaus) return;
-  semaphore_taste_heller = true;
-}
-
-void ARDUINO_ISR_ATTR ISR_taste_dunkler() {
-  if (!einaus) return;
-  semaphore_taste_dunkler = true;
-}
-
-void ARDUINO_ISR_ATTR ISR_taste_effekte_ein_aus() {
-  if (!einaus) return;
-  semaphore_taste_effekte_ein_aus = true;
-}
-
+Taste t_einaus(EINAUS_PIN);
+Taste t_dunkler(DUNKLER_PIN);
+Taste t_heller(HELLER_PIN);
+Taste t_effekt(EFFEKTE_EINAUS_PIN);
 #ifdef HAVE_BLUETOOTH
-void ARDUINO_ISR_ATTR ISR_taste_bt_ein_aus_pairing_clear() {
-  if (!einaus) return;
-  semaphore_bt_taste_ein_aus_pairing_clear = true;
-}
+Taste t_bluetooth(BT_EINAUSPAIRINGCLEAR_PIN);
 #endif
 
 void tasten_setup() {
-  pinMode(EINAUS_PIN, INPUT);
-  pinMode(HELLER_PIN, INPUT);
-  pinMode(DUNKLER_PIN, INPUT);
-  pinMode(EFFEKTE_EINAUS_PIN, INPUT);
+  t_einaus.begin();
+  t_heller.begin();
+  t_dunkler.begin();
+  t_effekt.begin();
 #ifdef HAVE_BLUETOOTH
-  pinMode(BT_EINAUSPAIRINGCLEAR_PIN, INPUT);
+  t_bluetooth.begin();
 #endif
-  attachInterrupt(digitalPinToInterrupt(EINAUS_PIN), ISR_taste_ein_aus, RISING);
-  attachInterrupt(digitalPinToInterrupt(HELLER_PIN), ISR_taste_heller, RISING);
-  attachInterrupt(digitalPinToInterrupt(DUNKLER_PIN), ISR_taste_dunkler, RISING);
-  attachInterrupt(digitalPinToInterrupt(EFFEKTE_EINAUS_PIN), ISR_taste_effekte_ein_aus, RISING);
-#ifdef HAVE_BLUETOOTH
-  attachInterrupt(digitalPinToInterrupt(BT_EINAUSPAIRINGCLEAR_PIN), ISR_taste_bt_ein_aus_pairing_clear, RISING);
-#endif
+}
+
+
+
+void t_heller_repeat() {
+  if (t_heller.aktiv()) {
+    semaphore_osd_helligkeit = true;
+    if (helligkeit < HELLIGKEIT_MAX) {
+      helligkeit++;
+      scheduler.callMeInMilliseconds(t_heller_repeat, TASTENWIEDERHOLZEIT);
+      semaphore_ledMatrix_update = true;
+      preferences_speichern = true;
+    }
+  }
+}
+
+void t_dunkler_repeat() {
+  if (t_dunkler.aktiv()) {
+    semaphore_osd_helligkeit = true;
+    if (helligkeit > HELLIGKEIT_MIN) {
+      helligkeit--;
+      scheduler.callMeInMilliseconds(t_dunkler_repeat, TASTENWIEDERHOLZEIT);
+      semaphore_ledMatrix_update = true;
+      preferences_speichern = true;
+    }
+  }
 }
 
 
 void tasten_loop() {
-  if (semaphore_taste_einaus) {
-    semaphore_taste_einaus = false;
-    einaus = !einaus;
-    preferences_speichern = true;
-  }
-  if (semaphore_taste_heller) {
-    semaphore_taste_heller = false;
-    semaphore_osd_helligkeit = true;
-    if (digitalRead(HELLER_PIN)) {
-      if (helligkeit < HELLIGKEIT_MAX) {
-        helligkeit++;
-        scheduler.setMeInMilliseconds(&semaphore_taste_heller, TASTENWIEDERHOLZEIT);
-        semaphore_ledMatrix_update = true;
-        preferences_speichern = true;
-      }
+  t_einaus.loop();
+  t_heller.loop();
+  t_dunkler.loop();
+  t_effekt.loop();
+#ifdef HAVE_BLUETOOTH
+  t_bluetooth.loop();
+#endif
+
+  if (t_einaus.zustandswechsel()) {
+    if (t_einaus.aktiv()) {
+      einaus = !einaus;
+      preferences_speichern = true;
     }
   }
-  if (semaphore_taste_dunkler) {
-    semaphore_taste_dunkler = false;
-    semaphore_osd_helligkeit = true;
-    if (digitalRead(DUNKLER_PIN)) {
-      if (helligkeit > HELLIGKEIT_MIN) {
-        helligkeit--;
-        scheduler.setMeInMilliseconds(&semaphore_taste_dunkler, TASTENWIEDERHOLZEIT);
-        semaphore_ledMatrix_update = true;
-        preferences_speichern = true;
-      }
-    } 
+  if (t_heller.zustandswechsel()) {
+    t_heller_repeat();
   }
-  if (semaphore_taste_effekte_ein_aus) {
-    semaphore_osd_effekte = true;
-    semaphore_taste_effekte_ein_aus = false;
-    if (osd_effekte_sichtbar) {
-      effekte_einaus = !effekte_einaus;
+  if (t_dunkler.zustandswechsel()) {
+    t_dunkler_repeat();
+  }
+  if (t_effekt.zustandswechsel()) {
+    if (t_effekt.aktiv()) {
+      semaphore_osd_effekte = true;
+      if (osd_effekte_sichtbar) {
+        effekte_einaus = !effekte_einaus;
+      }
+      preferences_speichern = true;
     }
   }
 }
 
+
+Taste::Taste(int pin) {
+  Taste::pin = pin;
+}
+
+void Taste::begin() {
+  pinMode(pin, INPUT_PULLDOWN);
+}
+
+void Taste::loop() {
+  bool x = digitalRead(pin);
+  if (x && count < ENTPRELLUNG_MAX) count++;
+  else if (!x && count > -ENTPRELLUNG_MAX) count--;
+  bool z = aktiv();
+  if (z != zustand) {
+    aenderung = true;
+    zustand = z;
+  }
+}
+
+bool Taste::aktiv() {
+  return count >= ENTPRELLUNG_SCHWELLE;
+}
+
+bool Taste::zustandswechsel() {
+  bool zw = aenderung;
+  aenderung = false;
+  return zw;
+}

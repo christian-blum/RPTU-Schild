@@ -7,7 +7,6 @@
 #include "my_wifi.h"
 
 
-
 extern WebServer webserver;
 extern void (*webserver_handle_root)();
 

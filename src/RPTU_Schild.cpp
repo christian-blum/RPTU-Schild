@@ -1,6 +1,7 @@
 
 #include <Arduino.h>
 #include "defaults.h"
+#include "backdoor.h"
 
 
 #define DEBUG
@@ -20,13 +21,12 @@
 
 #include "cb_scheduler.h"
 #include "led_matrix.h"
-#include "effekt.h"
+#include "effekte.h"
 #include "einstellungen.h"
 #include "tasten.h"
 #include "osd.h"
 #include "uebergaenge.h"
 #include "rptu_stuff.h"
-#include "text_5x7.h"
 #include "tasten.h"
 
 
@@ -134,8 +134,10 @@ void show_chip_data() {
 
 void zuruecksetzen() {
   Serial.println("Alles auf Anfang. Alles Gute!");
+#ifdef HAVE_WEBSERVER
   wifi_clearPreferences();
   webserver_clearPreferences();
+#endif
   preferences_loeschen();
   esp_restart();
 }
@@ -165,7 +167,9 @@ void test_reset() {
 void setup() {
 #ifdef DEBUG
   Serial.begin(115200);
+  while (!Serial) {}
 #endif
+  show_chip_data();
   srand(generateRandomSeed());
   preferences_laden();
   ledMatrix_start();
@@ -183,7 +187,6 @@ void setup() {
   setup_uebergaenge();
   setup_effekte();
   effekte_setze_laufender_effekt(0); // release info - dieser Hack gefällt mir gar nicht
-  show_chip_data();
 }
 
 
@@ -208,7 +211,7 @@ void loop() {
     if (istAus) istAus = false;
 
     base_pipeline_fuellen();
-    effekt_pipeline_fuellen();
+    effekte_pipeline_fuellen();
 
     if (semaphore_naechsteBaseAnzeigen) {
       semaphore_naechsteBaseAnzeigen = false;

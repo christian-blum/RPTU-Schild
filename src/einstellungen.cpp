@@ -4,8 +4,8 @@
 #include "einstellungen.h"
 #include "defaults.h"
 
-const char *credits = "      Gebaut von Tilman Pfersdorff und Christian Blum, 2024      ";
-const char *releaseInfo = "      SW Rel. " SOFTWARE_RELEASE "      ";
+const char *credits = "Gebaut von Tilman Pfersdorff und Christian Blum, 2024";
+const char *releaseInfo = "SW Rel. " SOFTWARE_RELEASE;
 
 
 /***********************************************************
