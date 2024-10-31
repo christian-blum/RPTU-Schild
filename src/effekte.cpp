@@ -22,8 +22,8 @@ struct sCRGBA ls_releaseInfo_schriftfarbe = { .x = 0xff00c0c0 };
 struct sCRGBA ls_credits_hintergrundfarbe = { .x = 0xfc000000 };
 struct sCRGBA ls_credits_schriftfarbe = { .x = 0xfc00c000 };
 
-Effekt_Laufschrift effekt_laufschrift_releaseInfo(false, true, 100, releaseInfo, 17, 50, ls_releaseInfo_schriftfarbe, ls_releaseInfo_hintergrundfarbe);
-Effekt_Laufschrift effekt_laufschrift_credits(false, true, 100, credits, 8, 50, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
+Effekt_Laufschrift effekt_laufschrift_releaseInfo(false, true, 100, "el_swver", "Laufschrift SW Version", releaseInfo, 17, 50, ls_releaseInfo_schriftfarbe, ls_releaseInfo_hintergrundfarbe);
+Effekt_Laufschrift effekt_laufschrift_credits(false, true, 100,  "el_credits", "Laufschrift Credits", credits, 8, 50, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
 Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
 
 std::array<Effekt *, 3> effekte_prototypen = {
@@ -82,7 +82,6 @@ Effekt *effekt_wuerfeln() {
     Effekt *e = effekte[i];
     x -= e->gewichtung;
     if (x < 0) {
-      Serial.println("Gewürfelter Effekt:"); Serial.println(e->name);
       return e;
     }
   }
@@ -117,14 +116,23 @@ void effekte_pipeline_fuellen() {
   }
 }
 
-void setup_effekte() {
-  for (int i = 0; i < effekte_prototypen.size(); i++) {
-    effekt_hinzufuegen(effekte_prototypen[i]);
+void effekte_prefs_schreiben() {
+  for (int i = 0; i < effekte.size(); i++) {
+    effekte[i]->prefs_schreiben();
+  }
+  effekte_gewichtungen_summieren(); // das ergibt tatsächlich Sinn.
+}
+
+void effekte_prefs_laden() {
+  for (int i = 0; i < effekte.size(); i++) {
+    effekte[i]->prefs_laden();
   }
   effekte_gewichtungen_summieren();
 }
 
-
-void effekte_prefs_schreiben() {
-  Serial.println("effekte_prefs_schreiben() ist noch nicht implementiert");
+void setup_effekte() {
+  for (int i = 0; i < effekte_prototypen.size(); i++) {
+    effekt_hinzufuegen(effekte_prototypen[i]);
+  }
+  effekte_prefs_laden();
 }

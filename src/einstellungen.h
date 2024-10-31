@@ -29,7 +29,6 @@ extern String bt_device_name;
 
 extern uint32_t effekt_pause_max;
 extern uint32_t effekt_pause_min;
-extern uint16_t laufschrift_delay;
 
 extern uint16_t konfiguration_pause;
 

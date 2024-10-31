@@ -70,6 +70,8 @@ const char *html_einstellungen = R"literal(
             <td width="33%"><label class="switch"><input type="checkbox" name="hintergrund" ###HINTERGRUND###><span class="slider_switch round"></span></label></td></tr>
         <tr><td colspan="3" align='left'>Helligkeit</td></tr>
         <tr><td colspan="3" width='100%'><input type="range" min="2" max="255" name="hell" value="###HELLIGKEIT###" class="slider" id="hell"></td></tr>
+        <tr><td align="right">Effekt Pause min.</td><td><input type="text" name="epmin" value="###EPMIN###">ms</td><td></td></tr>
+        <tr><td align="right">Effekt Pause max.</td><td><input type="text" name="epmax" value="###EPMAX###">ms</td><td></td></tr>
       </table>
       <input type='button' value='Zurücksetzen' onClick='resetValues()'>&nbsp;<input type='button' value='Ändern' onClick='document.form.submit()'>
     </form>
@@ -97,6 +99,8 @@ void config_pages_einstellungen() {
     s.replace("###EINAUS###", einaus ? "checked":"");
     s.replace("###EFFEKTE###", effekte_einaus ? "checked":"");
     s.replace("###HINTERGRUND###", hintergrund_schwarz ? "checked":"");
+    s.replace("###EPMIN###", String(effekt_pause_min));
+    s.replace("###EPMAX###", String(effekt_pause_max));
     webserver.send(200, "text/html", s);
     break;
   case HTTP_POST:
@@ -128,6 +132,19 @@ void config_pages_einstellungen() {
     e = (s == "on");
     if (e != hintergrund_schwarz) {
       hintergrund_schwarz = e;
+      preferences_speichern = true;
+    }
+    s = webserver.arg("epmin");
+    uint32_t epmin = s.toInt();
+    s = webserver.arg("epmax");
+    uint32_t epmax = s.toInt();
+    if (epmax < epmin) epmax = epmin;
+    if (effekt_pause_min != epmin) {
+      effekt_pause_min = epmin;
+      preferences_speichern = true;
+    }
+    if (effekt_pause_max != epmax) {
+      effekt_pause_max = epmax;
       preferences_speichern = true;
     }
     webserver_send_redirect("/");
@@ -307,11 +324,17 @@ void config_pages_effekt(String &s, Effekt *e) {
       case EPT_TEXT:
         l += "<br/><span style='white-space: nowrap;'>";
         l += webserver_quote_special(p->name);
-        l += ": <input type=text style='width: 95%;' name='";;
-        l += _tag;
-        l += "' value='";
-        l += webserver_quote_special(*(char **)p->variable);
-        l += "'>";
+        l += ": ";
+        if (e->loeschbar) {
+          l += "<input type=text style='width: 95%;' name='";;
+          l += _tag;
+          l += "' value='";
+          l += webserver_quote_special(*(char **)p->variable);
+          l += "'>";
+        }
+        else {
+          l += webserver_quote_special(*(char **)p->variable); // nicht veränderbar
+        }
         l += "</span>";
         break;
       case EPT_BOOL:
@@ -330,6 +353,7 @@ void config_pages_effekt(String &s, Effekt *e) {
       case EPT_USHORT:
       case EPT_SHORT:
       case EPT_FLOAT:
+      case EPT_RGBA:
         s += "<input type='text' size='";
         s += p->laenge;
         s += "' name='";
@@ -338,6 +362,7 @@ void config_pages_effekt(String &s, Effekt *e) {
         if (p->typ == EPT_USHORT) s += *((uint16_t *)p->variable);
         else if (p->typ == EPT_SHORT) s += *((int16_t *)p->variable);
         else if (p->typ == EPT_FLOAT) s += *((float *)p->variable);
+        else if (p->typ == EPT_RGBA) { char buf[9]; sprintf(buf,"%8.8x", ((struct sCRGBA *)p->variable)->x); s += buf; }
         s += "'>";
         if (p->einheit) { s += "&nbsp;"; s += webserver_quote_special(p->einheit); } 
         break;
@@ -356,18 +381,18 @@ const char *html_effekte_anfang = R"literal(
     <link rel='icon' href='/favicon.ico' sizes='any'>
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8"> 
+    <meta charset="ISO-8859-1"> 
     <title>RPTU-Schild - Effekte</title>
   </head>
   <body>
     <h1>RPTU-Schild</h1>
     <h2>Effekte</h2>
-    <form method='POST' name='form'>
+    <form method='POST' name='form' accept-charset='ISO-8859-1'>
       <table border=0 width='100%'>
 )literal";
 const char *html_effekte_ende = R"literal(
       </table>
-      <input type='button' value='Zurück zum Menü' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='Ändern' onClick='document.form.submit()'>
+      <input type='button' value='Zur&uuml;ck zum Men&uuml;' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='&Auml;ndern' onClick='document.form.submit()'>
       <input type='hidden' name='defaults_laden' id='defaults_laden' value=''>
       <input type='hidden' name='back' id='back' value=''>
     </form>
@@ -429,6 +454,9 @@ void config_pages_effekte() {
                           ((Effekt_Laufschrift *)e)->neuer_text(webserver.arg(i).c_str());
                         }
                       }
+                      break;
+                    case EPT_RGBA:
+                      ((struct sCRGBA *)p->variable)->x = strtol(webserver.arg(i).c_str(), NULL, 16);
                       break;
                   }
                 }

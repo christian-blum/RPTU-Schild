@@ -164,6 +164,8 @@ void test_reset() {
   if (x) zuruecksetzen();
 }
 
+#include "text_5x7.h"
+
 void setup() {
 #ifdef DEBUG
   Serial.begin(115200);

@@ -267,7 +267,109 @@ static const uint8_t font_5x7[] = {
 
 
 
+char iso88591(char ch) {
+	unsigned char c = ch;
+	switch(c) {
+	case 0xa2: c = 155; break;
+	case 0xa3: c = 156; break;
+	case 0xa5: c = 157; break;
+	case 0xa6: c = 173; break;
+	case 0xaa: c = 166; break;
+	case 0xab: c = 174; break;
+	case 0xb0: c = 248; break;
+	case 0xb1: c = 241; break;
+	case 0xb2: c = 253; break;
+	case 0xb5: c = 230; break;
+	case 0xba: c = 167; break;
+	case 0xbb: c = 175; break;
+	case 0xbc: c = 172; break;
+	case 0xbd: c = 171; break;
+	case 0xbf: c = 168; break;
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: c = 'A'; break;
+	case 0xc4: c = 142; break; // Ä
+	case 0xc5: c = 143; break;
+	case 0xc6: c = 146; break;
+  case 0xc7: c = 128; break;
+	case 0xc8: c = 'E'; break;
+	case 0xc9: c = 144; break;
+	case 0xca: case 0xcb: c = 'E'; break;
+	case 0xcc: case 0xcd: case 0xce: case 0xcf: c = 'I'; break;
+	case 0xd0: c = 'D'; break;
+	case 0xd1: c = 165; break;
+	case 0xd2: c = 'O'; break;
+	case 0xd3: c = 162; break;
+	case 0xd4: case 0xd5: c = 'O'; break;
+	case 0xd6: c = 153; break; // Ö
+	case 0xd8: c = 237; break;
+	case 0xd9: case 0xda: case 0xdb: c = 'U'; break;
+	case 0xdc: c = 154; break;
+	case 0xdd: c = 'Y'; break;
+	case 0xdf: c = 225; break;
+	case 0xe0: c = 133; break;
+	case 0xe1: c = 134; break;
+	case 0xe2: c = 131; break;
+	case 0xe3: c = 'a'; break;
+	case 0xe4: c = 132; break; // ä
+	case 0xe5: c = 160; break;
+	case 0xe6: c = 145; break;
+	case 0xe7: c = 135; break;
+	case 0xe8: c = 138; break;
+	case 0xe9: c = 130; break;
+	case 0xea: c = 136; break;
+	case 0xeb: c = 137; break;
+	case 0xec: c = 141; break;
+	case 0xed: c = 161; break;
+	case 0xee: c = 140; break;
+	case 0xef: c = 139; break;
+	case 0xf1: c = 164; break;
+	case 0xf2: c = 149; break;
+	case 0xf3: c = 162; break;
+	case 0xf4: c = 147; break;
+	case 0xf5: c = 'o'; break;
+	case 0xf6: c = 148; break;
+	case 0xf7: c = 246; break;
+	case 0xf8: c = 237; break;
+	case 0xf9: c = 151; break;
+	case 0xfa: c = 163; break;
+	case 0xfb: c = 150; break;
+	case 0xfc: c = 129; break;
+	case 0xfd: c = 'y'; break;
+	case 0xff: c = 152; break;
+	}
+	return (char)c;
+}
 
+/*
+void zeichen_5x7_dump(int i) {
+	Serial.println("---------------");
+	Serial.printf("Zeichen %d\n\n",i);
+  const uint8_t *z;
+  z = font_5x7 + 5*i;
+  uint8_t b = 0x01;
+  for (int yy = 0; yy < 7; yy++) {
+    if (true) {
+      for (int xx = 0; xx < 5; xx++) {
+        if (true) {
+          if (*(z+xx) & b) {
+            Serial.print("*");
+          }
+          else {
+						Serial.print(" ");
+          }
+        }
+      }
+			Serial.println();
+    }
+    b <<= 1;
+  }
+}
+
+void charset_dump() {
+	for (int i = 192; i < 256; i++) {
+		zeichen_5x7_dump(i);
+	}
+}
+*/
 
 void zeichen_5x7_rendern(struct sCRGBA *bitmap, int16_t x, int16_t y, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe, uint8_t c) {
   const uint8_t *z;

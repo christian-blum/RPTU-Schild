@@ -46,7 +46,6 @@ void preferences_ausgeben() {
   uebergaenge_prefs_ausgeben(s);
   PREF_APPEND(s, PREF_EFFEKT_PAUSE_MAX, effekt_pause_max);
   PREF_APPEND(s, PREF_EFFEKT_PAUSE_MIN, effekt_pause_min);
-  PREF_APPEND(s, PREF_LAUFSCHRIFT_DELAY, laufschrift_delay);
   PREF_APPEND(s, PREF_KONFIGURATION_PAUSE, konfiguration_pause);
   Serial.print(s);
 }
@@ -61,7 +60,6 @@ void preferences_laden() {
     hintergrund_schwarz = p.getBool(PREF_HG_SCHWARZ, false);
     effekt_pause_max = p.getULong(PREF_EFFEKT_PAUSE_MAX, EFFEKT_PAUSE_MAX);
     effekt_pause_min = p.getULong(PREF_EFFEKT_PAUSE_MIN, EFFEKT_PAUSE_MIN);
-    laufschrift_delay = p.getUShort(PREF_LAUFSCHRIFT_DELAY, LAUFSCHRIFT_DELAY);
     konfiguration_pause = p.getUShort(PREF_KONFIGURATION_PAUSE, KONFIGURATION_PAUSE);
 #ifdef HAVE_BLUETOOTH
     bt_einaus = p.getUChar(PREF_BT_EINAUS);
@@ -86,7 +84,6 @@ void preferences_schreiben() {
     if (p.getBool(PREF_HG_SCHWARZ) != hintergrund_schwarz) p.putBool(PREF_HG_SCHWARZ, hintergrund_schwarz);
     if (p.getULong(PREF_EFFEKT_PAUSE_MAX) != effekt_pause_max) p.putULong(PREF_EFFEKT_PAUSE_MAX, effekt_pause_max);
     if (p.getULong(PREF_EFFEKT_PAUSE_MIN) != effekt_pause_min) p.putULong(PREF_EFFEKT_PAUSE_MIN, effekt_pause_min);
-    if (p.getUShort(PREF_LAUFSCHRIFT_DELAY) != laufschrift_delay) p.putUShort(PREF_LAUFSCHRIFT_DELAY, laufschrift_delay);
     if (p.getUShort(PREF_KONFIGURATION_PAUSE) != konfiguration_pause) p.putUShort(PREF_KONFIGURATION_PAUSE, konfiguration_pause);
 #ifdef HAVE_BLUETOOTH
     if (p.getUChar(PREF_BT_EINAUS) != bt_einaus) p.putUChar(PREF_BT_EINAUS, bt_einaus);

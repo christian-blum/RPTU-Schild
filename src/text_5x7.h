@@ -10,5 +10,7 @@
 
 
 void text_rendern(struct sCRGBA *bitmap, struct sPosition wo, struct sCRGBA *schriftfarbe, struct sCRGBA *hintergrundfarbe, const char *text);
+char iso88591(char ch);
+void charset_dump();
 
 #endif

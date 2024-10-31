@@ -25,12 +25,13 @@ Effekt_GIMP::Effekt_GIMP(bool loeschbar, bool aktiv, uint16_t gewichtung, const 
   strcpy(buffer, artwork->comment);
   name = buffer;
   String b;
-  b += "Zeigt sporadisch die Grafik \"";
+  b += "Zeigt die Grafik \"";
   b += artwork->comment;
   b += "\" an.";
   buffer = new char[b.length()+1];
   strcpy(buffer, b.c_str());
   beschreibung = buffer;
+  parameter.push_back(P_DAUER);
 }
 
 Effekt_GIMP::~Effekt_GIMP() {

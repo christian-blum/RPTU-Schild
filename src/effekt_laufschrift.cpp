@@ -7,7 +7,7 @@ static inline uint32_t rotateLeft(uint32_t x, int n) {
 
 
 
-Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) : Effekt(loeschbar, aktiv, gewichtung) {
+Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *tag, const char *name, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) : Effekt(loeschbar, aktiv, gewichtung) {
   text = nullptr;
   zeichenzahl = 0;
   count_ende = 0;
@@ -22,13 +22,14 @@ Effekt_Laufschrift::Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewi
   for (const char *c = anzeigetext; *c; c++) {
     x = rotateLeft(x, 1) ^ (const unsigned char) *c; 
   }
-  char *_tag = new char[12];
-  sprintf(_tag, "el_%8.8x", x);
-  tag = _tag;
-  char *_name = new char[21];
-  sprintf(_name, "Laufschrift %8.8x", x);
-  name = _name;
-  const char *_beschreibung = "Zeigt sporadisch eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Umlaute Ä, Ö und Ü sowie ß sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
+
+  char *_tag = new char[strlen(tag)+1];
+  strcpy(_tag, tag);
+  Effekt::tag = _tag;
+  char *_name = new char[strlen(name)+1];
+  strcpy(_name, name);
+  Effekt::name = _name;
+  const char *_beschreibung = "Zeigt eine vom System oder vom Administrator konfigurierte Laufschrift an, die sich im vorgegebenen Intervall jeweils einen Pixel nach links bewegt. Deutsche Umlaute sind erlaubt, andere werden wahrscheinlich nicht korrekt dargestellt.";
   char *__beschreibung = new char[strlen(_beschreibung)+1];
   strcpy(__beschreibung, _beschreibung);
   Effekt_Laufschrift::beschreibung = __beschreibung;
@@ -59,7 +60,9 @@ void Effekt_Laufschrift::text_padding() {
   char *neuer_text = new char[zeichenzahl + 1];
   char *c = neuer_text;
   for (int i = 0; i < LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2; i++) *c++ = ' ';
-  memcpy(c, anzeigetext, anzeigetext_laenge); c += anzeigetext_laenge;
+  for (int i = 0; i < anzeigetext_laenge; i++) {
+    *c++ = iso88591(anzeigetext[i]);
+  }
   for (int i = 0; i < LAUFSCHRIFT_TEXTFRAGMENT_GROESSE - 2; i++) *c++ = ' ';
   *c = '\0';
   if (text) delete[] text;
@@ -72,6 +75,7 @@ void Effekt_Laufschrift::neuer_text(const char *anzeigetext) {
   memcpy(at, anzeigetext, strlen(anzeigetext)+1);
   if (Effekt_Laufschrift::anzeigetext) delete[] Effekt_Laufschrift::anzeigetext; // bitte Reihenfolge so lassen, das ist narrensicher (z.B. Aufruf mit Pointer auf alten Heap-Text)
   Effekt_Laufschrift::anzeigetext = at;
+  text_padding();
 }
 
 void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe) {
@@ -80,8 +84,6 @@ void Effekt_Laufschrift::neuer_text(const char *anzeigetext, int16_t ypos, uint1
   Effekt_Laufschrift::millis = millis;
   Effekt_Laufschrift::schriftfarbe = schriftfarbe;
   Effekt_Laufschrift::hintergrundfarbe = hintergrundfarbe;
-  text_padding();
-  Effekt::prefs_schreiben();
 }
 
 bool Effekt_Laufschrift::doit() {
@@ -116,14 +118,24 @@ bool Effekt_Laufschrift::doit() {
 
 void Effekt_Laufschrift::prefs_laden(Preferences& p) {
   Effekt::prefs_laden(p);
-  uint16_t millis = p.getUShort(PREF_ANZEIGETEXT, millis);
-  struct sCRGBA schriftfarbe;
-  schriftfarbe.x = p.getULong(PREF_SCHRIFTFARBE, schriftfarbe.x);
-  struct sCRGBA hintergrundfarbe;
-  hintergrundfarbe.x = p.getULong(PREF_HINTERGRUNDFARBE, hintergrundfarbe.x);
-  String t = p.getString(PREF_ANZEIGETEXT, anzeigetext);
-  int16_t ypos = p.getShort(PREF_YPOS, ypos);
-  neuer_text(t.c_str(), ypos, millis, schriftfarbe, hintergrundfarbe);
+  if (p.isKey(PREF_MILLIS)) {
+    millis = p.getUShort(PREF_MILLIS, millis);
+  }
+  if (p.isKey(PREF_SCHRIFTFARBE)) {
+    struct sCRGBA schriftfarbe;
+    schriftfarbe.x = p.getULong(PREF_SCHRIFTFARBE, schriftfarbe.x);
+  }
+  if (p.isKey(PREF_HINTERGRUNDFARBE)) {
+    struct sCRGBA hintergrundfarbe;
+    hintergrundfarbe.x = p.getULong(PREF_HINTERGRUNDFARBE, hintergrundfarbe.x);
+  }
+  if (p.isKey(PREF_ANZEIGETEXT)) {
+    String t = p.getString(PREF_ANZEIGETEXT, anzeigetext);
+    neuer_text(t.c_str());
+  }
+  if (p.isKey(PREF_YPOS)) {
+    ypos = p.getShort(PREF_YPOS, ypos);
+  }
 }
 
 void Effekt_Laufschrift::prefs_schreiben(Preferences& p) {

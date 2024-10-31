@@ -18,8 +18,8 @@ class Effekt_Laufschrift : public Effekt {
   private:
     const struct sEffektParameter P_YPOS = { "ypos", "Zeile", EPT_SHORT, 5, nullptr, (void *) &ypos };
     const struct sEffektParameter P_MILLIS = { "millis", "Zeit pro Pixel", EPT_USHORT, 5, "ms", (void *) &millis };
-    const struct sEffektParameter P_SF = { "sf", "Schriftfarbe", EPT_RGBA, 5, nullptr, (void *) &schriftfarbe };
-    const struct sEffektParameter P_HF = { "hf", "Hintergrundfarbe", EPT_RGBA, 5, nullptr, (void *) &hintergrundfarbe };
+    const struct sEffektParameter P_SF = { "sf", "Schriftfarbe", EPT_RGBA, 8, "ABGR", (void *) &schriftfarbe };
+    const struct sEffektParameter P_HF = { "hf", "Hintergrundfarbe", EPT_RGBA, 8, "ABGR", (void *) &hintergrundfarbe };
     const struct sEffektParameter P_TEXT = { "text", "Text", EPT_TEXT, 30, nullptr, (void *) &anzeigetext };
 
     char *text; // nullterminiert, mit genügend vielen Leerzeichen davor und dahinter (LTG - 2)
@@ -33,7 +33,7 @@ class Effekt_Laufschrift : public Effekt {
 
   public:
    ~Effekt_Laufschrift();
-    Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe);
+    Effekt_Laufschrift(bool loeschbar, bool aktiv, uint16_t gewichtung, const char *tag, const char *name, const char *anzeigetext, int16_t ypos, uint16_t millis, struct sCRGBA schriftfarbe, struct sCRGBA hintergrundfarbe);
 
     // bitte nichts davon extern manipulieren!
     const char *default_anzeigetext;

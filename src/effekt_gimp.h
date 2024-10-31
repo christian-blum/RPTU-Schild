@@ -8,7 +8,10 @@
 
 class Effekt_GIMP : public Effekt {
 
-  const struct sGIMP *artwork;
+  private:
+    const struct sGIMP *artwork;
+    
+    const struct sEffektParameter P_DAUER = { "dauer", "Anzeigedauer", EPT_USHORT, 5, "ms", (void *) &dauer };
 
   public:
     Effekt_GIMP(bool loeschbar, bool aktiv, uint16_t gewichtung, const struct sGIMP *artwork, uint16_t dauer);
