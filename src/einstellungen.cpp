@@ -52,7 +52,17 @@ void preferences_ausgeben() {
 
 void preferences_laden() {
   Preferences p;
-  Serial.println("preferences_laden()");
+  helligkeit = HELLIGKEIT_DEFAULT;
+  einaus = true;
+  effekte_einaus = true;
+  hintergrund_schwarz = false;
+  effekt_pause_max = EFFEKT_PAUSE_MAX;
+  effekt_pause_min = EFFEKT_PAUSE_MIN;
+  konfiguration_pause = KONFIGURATION_PAUSE;
+#ifdef HAVE_BLUETOOTH
+  bt_einaus = true;
+  bt_device_name = BT_DEFAULT_DEVICE_NAME;
+#endif
   if (p.begin(PREF_NAMESPACE_ALLGEMEIN, true)) {
     einaus = p.getBool(PREF_EINAUS, true);
     helligkeit = p.getUChar(PREF_HELLIGKEIT, HELLIGKEIT_DEFAULT);
@@ -65,9 +75,6 @@ void preferences_laden() {
     bt_einaus = p.getUChar(PREF_BT_EINAUS);
     bt_device_name = p.getString(PREF_BT_DEVICE_NAME, BT_DEFAULT_DEVICE_NAME);
 #endif
-  }
-  else {
-    Serial.println("Kann NVS namespace " PREF_NAMESPACE_ALLGEMEIN " nicht lesen.");
   }
   p.end();
   uebergaenge_prefs_laden();
@@ -95,17 +102,3 @@ void preferences_schreiben() {
   p.end();
   uebergaenge_prefs_schreiben();
 }
-
-
-void preferences_loeschen() {
-  Preferences p;
-  if (p.begin(PREF_NAMESPACE_ALLGEMEIN, false)) {
-    p.clear();
-  }
-  else {
-    Serial.println("Kann NVS namespace " PREF_NAMESPACE_ALLGEMEIN " nicht löschen.");
-  }
-  p.end();
-}
-
-

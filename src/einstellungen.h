@@ -45,6 +45,5 @@ extern CB_Scheduler scheduler;
 void preferences_ausgeben();
 void preferences_laden();
 void preferences_schreiben();
-void preferences_loeschen();
 
 #endif
