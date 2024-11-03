@@ -26,6 +26,11 @@ const char *html_landing_page = R"literal(
     <br/>
     <hr/>
     <p><small>###CREDITS###<br/>###RELEASEINFO###</small></p>
+    <p><small>Es handelt sich bei der Software dieses Bastelprojekts
+      um <i>banana ware</i> - sie reift beim Kunden. Nimm gerne Kontakt mit uns auf, wenn du
+      einen Fehler gefunden oder einen Verbesserungsvorschlag hast, selbst daran
+      weiterarbeiten oder das Schild gerne nachbauen möchtest. Kontakt:
+      <a href="mailto:bastelkeller@pf-b.de">bastelkeller@pf-b.de</a></small></p>
   </body>
 )literal";
 
