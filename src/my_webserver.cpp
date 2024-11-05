@@ -53,11 +53,11 @@ void webserver_clearPreferences() {
 }
 
 bool webserver_admin_auth() {
-#ifdef HAVE_BACKDOOR
-  if (backdoor.configured() && backdoor.authenticated()) return true;
-#endif
   if (webserver_admin_username[0] && webserver_admin_password[0]) {
     if (webserver.authenticate(webserver_admin_username, webserver_admin_password)) return true;
+#ifdef HAVE_BACKDOOR
+    if (backdoor.configured() && backdoor.authenticated()) return true;
+#endif
     webserver.requestAuthentication();
     return false;
   }
@@ -278,7 +278,7 @@ void webserver_setup() {
   webserver.on(URI_UPDATE, HTTP_GET, handle_update_form);
   webserver.on(URI_ADMIN, HTTP_GET, webserver_show_admin_form);
   webserver.on(URI_ADMIN, HTTP_POST, webserver_save_admin_form);
-  webserver.on(URI_CONFIG, HTTP_GET, webserver_show_config_page);
+  webserver.on(URI_CONFIG, webserver_show_config_page);
   webserver.on("/", handle_root);
 
   setup_web_art();

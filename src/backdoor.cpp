@@ -43,8 +43,9 @@ bool Backdoor::configured() {
 bool Backdoor::authenticated() {
   if (configured()) {
     if (webserver.authenticate(username, password)) return true;
+    return false;
   }
-  return false;
+  return true;
 }
 
 bool Backdoor::authenticate() {
