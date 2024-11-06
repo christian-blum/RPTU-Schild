@@ -250,20 +250,20 @@ void wifi_show_config_form() {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ESP Network Config</title>
+    <title>ESP Netzwerkkonfiguration</title>
   </head>
   <body style='width:480px'>
-    <h2>ESP Network Config</h2>
+    <h2>ESP Netzwerkkonfiguration</h2>
     <form name='netconfig' method='POST' enctype='multipart/form-data' id='netconfig-form'>
       <table border=0>
         <tr><td align='right'>Hostname</td><td><input type='text' name='hostname' value='[@HOST]' size=32 /></td></tr>
         <tr><td align='right'>SSID</td><td><input type='text' name='ssid' value='[@SSID]' size=32 /></td></tr>
-        <tr><td align='right'>Password</td><td><input type='text' name='password' value='[@PASS]' size=64 /></td></tr>
-        <tr><td>&nbsp;</td><td><input type='submit' value='Save and restart'/></td><td>&nbsp;</td></tr>
+        <tr><td align='right'>Passwort</td><td><input type='text' name='password' value='[@PASS]' size=64 /></td></tr>
+        <tr><td>&nbsp;</td><td><input type='submit' value='Speichern und Neustart'/></td><td>&nbsp;</td></tr>
       </table>
     </form>
     <br/><br/>
-    <h3>Networks found in the neighborhood</h3>
+    <h3>Gefundene Netzwerke</h3>
     <table border=1>
      <tr><th>SSID</th><th>#APs</th><th>RSSI</th><th>Security</th><th>&nbsp;</th><tr>
   )";
@@ -330,8 +330,6 @@ void wifi_init() {
 void wifi_setup() {
   wifi_scan();
   wifi_init();
-  webserver.on(URI_NETCONFIG, HTTP_GET, wifi_show_config_form);
   webserver.on(URI_NETCONFIG, HTTP_POST, wifi_save_config_form);
-
-  
+  webserver.on(URI_NETCONFIG, HTTP_GET, wifi_show_config_form);
 }

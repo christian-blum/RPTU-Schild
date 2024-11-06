@@ -78,7 +78,7 @@ void preferences_laden() {
   }
   p.end();
   uebergaenge_prefs_laden();
-  preferences_ausgeben();
+  //preferences_ausgeben();
 }
 
 void preferences_schreiben() {

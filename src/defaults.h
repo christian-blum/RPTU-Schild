@@ -2,14 +2,14 @@
 #define __DEFAULTS_H
 
 
-#define SOFTWARE_RELEASE "1.0/20241105"
+#define SOFTWARE_RELEASE "1.0/20241106"
 #define HAVE_WEBSERVER
 #undef HAVE_BLUETOOTH
-#define HAVE_BACKDOOR
+#undef HAVE_BACKDOOR
 #define HAVE_FAVICON
 
 #define TASTENWIEDERHOLZEIT 30 // und das sind 30 Millisekunden, also maximal 33 Inkrementschritte pro Sekunde
-#define OSD_DAUER 3000
+#define OSD_DAUER 5000
 
 #define KONFIGURATION_PAUSE 5000  // Millisekunden
 

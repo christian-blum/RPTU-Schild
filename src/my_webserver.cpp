@@ -120,9 +120,9 @@ const char *config_page = R"literal(
   <meta charset="UTF-8"> 
   <body>
     <h2>ESP config</h2>
-    <p><a href='/admin'>Admin configuration page</a></p>
-    <p><a href='/netconfig'>Network configuration page</a></p>
-    <p><a href='/update'>OTA Update</a></p>
+    <p><a href='/admin'>Administratoreinstellungen</a></p>
+    <p><a href='/netconfig'>Netzwerkeinstellungen</a></p>
+    <p><a href='/update'>OTA-Update</a></p>
   </body>
 )literal";
 
@@ -152,7 +152,7 @@ void handleUpdate() {
   }
   HTTPUpload &upload = webserver.upload();
   if (upload.status == UPLOAD_FILE_START) {
-    Serial.printf("Receiving Update: %s, Size: %d\n", upload.filename.c_str(), fsize);
+    Serial.printf("Update wird hochgeladen: %s, Größe: %d\n", upload.filename.c_str(), fsize);
     if (!Update.begin(fsize)) {
       otaDone = 0;
       Update.printError(Serial);
@@ -165,7 +165,7 @@ void handleUpdate() {
     }
   } else if (upload.status == UPLOAD_FILE_END) {
     if (Update.end(true)) {
-      Serial.printf("Update Success: %u bytes\nRebooting...\n", upload.totalSize);
+      Serial.printf("Update erfolgreich: %u bytes\nNeustart...\n", upload.totalSize);
     } else {
       Serial.printf("%s\n", Update.errorString());
       otaDone = 0;
@@ -211,15 +211,15 @@ void webserver_show_admin_form() {
     <link rel="stylesheet" href="/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
-    <title>ESP General Administration</title>
+    <title>ESP Administratoreinstellungen</title>
   </head>
   <body>
-    <h2>ESP General Administration</h2>
+    <h2>ESP Administratoreinstellungen</h2>
     <form name='admin' method='POST' enctype='multipart/form-data' id='admin-form'>
       <table border=0>
-        <tr><td align='right'>Admin username</td><td><input type='text' name='username' value='[@USER]' size=32 /></td></tr>
-        <tr><td align='right'>Admin password</td><td><input type='text' name='password' value='[@PASS]' size=32 /></td></tr>
-        <tr><td>&nbsp;</td><td><input type='submit' value='Save'/></td><td>&nbsp;</td></tr>
+        <tr><td align='right'>Admin-Benutzername</td><td><input type='text' name='username' value='[@USER]' size=32 /></td></tr>
+        <tr><td align='right'>Admin-Passwort</td><td><input type='text' name='password' value='[@PASS]' size=32 /></td></tr>
+        <tr><td>&nbsp;</td><td><input type='submit' value='Speichern'/></td><td>&nbsp;</td></tr>
       </table>
       <input type='hidden' name='referer' value='[@REF]' />
     </form>
@@ -289,7 +289,7 @@ void webserver_setup() {
 #endif
 
   webserver.begin();
-  Serial.printf("Web server ready http://%s.local/ or http://esp32.local/ or http://%s/\n", wifi_hostname, wifi_ip.toString().c_str());
+  Serial.printf("Webserver bereit http://%s.local/ oder http://esp32.local/ oder http://%s/\n", wifi_hostname, wifi_ip.toString().c_str());
 }
 
 
