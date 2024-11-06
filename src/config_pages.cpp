@@ -75,11 +75,12 @@ const char *html_einstellungen = R"literal(
             <td width="33%"><label class="switch"><input type="checkbox" name="hintergrund" ###HINTERGRUND###><span class="slider_switch round"></span></label></td></tr>
         <tr><td colspan="3" align='left'>Helligkeit</td></tr>
         <tr><td colspan="3" width='100%'><input type="range" min="2" max="255" name="hell" value="###HELLIGKEIT###" class="slider" id="hell"></td></tr>
-        <tr><td align="right">Effekt Pause min.</td><td><input type="text" name="epmin" value="###EPMIN###">ms</td><td></td></tr>
-        <tr><td align="right">Effekt Pause max.</td><td><input type="text" name="epmax" value="###EPMAX###">ms</td><td></td></tr>
+        <tr><td align="right">Effekt Pause min.</td><td colspan=2><input type="text" name="epmin" value="###EPMIN###">ms</td></tr>
+        <tr><td align="right">Effekt Pause max.</td><td colspan=2><input type="text" name="epmax" value="###EPMAX###">ms</td></tr>
       </table>
-      <input type='button' value='Zurücksetzen' onClick='resetValues()'>&nbsp;<input type='button' value='Ändern' onClick='document.form.submit()'>
-    </form>
+      <input type='button' value='Zurück zum Menü' onClick='document.getElementById("back").value="back"; document.form.submit()'>&nbsp;<input type='button' value='Zurücksetzen' onClick='resetValues()'>&nbsp;<input type='button' value='Ändern' onClick='document.form.submit()'>
+      <input type='hidden' name='back' id='back' value=''>
+  </form>
     <br/>
     <hr/>
     <p><small>###CREDITS###<br/>###RELEASEINFO###</small></p>
@@ -115,44 +116,49 @@ void config_pages_einstellungen() {
       Serial.print(webserver.argName(i)); Serial.print("="); Serial.println(webserver.arg(i));
     }
 #endif
-    s = webserver.arg("hell");
-    h = s.toInt();
-    if (h != helligkeit) {
-      helligkeit = h;
-      preferences_speichern = true;
+    if ((webserver.arg("back")) == "back") {
+      webserver_send_redirect("/");
     }
-    s = webserver.arg("einaus");
-    e = (s == "on");
-    if (e != einaus) {
-      einaus = e;
-      preferences_speichern = true;
+    else {
+      s = webserver.arg("hell");
+      h = s.toInt();
+      if (h != helligkeit) {
+        helligkeit = h;
+        preferences_speichern = true;
+      }
+      s = webserver.arg("einaus");
+      e = (s == "on");
+      if (e != einaus) {
+        einaus = e;
+        preferences_speichern = true;
+      }
+      s = webserver.arg("effekte");
+      e = (s == "on");
+      if (e != effekte_einaus) {
+        effekte_einaus = e;
+        preferences_speichern = true;
+      }
+      s = webserver.arg("hintergrund");
+      e = (s == "on");
+      if (e != hintergrund_schwarz) {
+        hintergrund_schwarz = e;
+        preferences_speichern = true;
+      }
+      s = webserver.arg("epmin");
+      uint32_t epmin = s.toInt();
+      s = webserver.arg("epmax");
+      uint32_t epmax = s.toInt();
+      if (epmax < epmin) epmax = epmin;
+      if (effekt_pause_min != epmin) {
+        effekt_pause_min = epmin;
+        preferences_speichern = true;
+      }
+      if (effekt_pause_max != epmax) {
+        effekt_pause_max = epmax;
+        preferences_speichern = true;
+      }
+      webserver_send_redirect("/");
     }
-    s = webserver.arg("effekte");
-    e = (s == "on");
-    if (e != effekte_einaus) {
-      effekte_einaus = e;
-      preferences_speichern = true;
-    }
-    s = webserver.arg("hintergrund");
-    e = (s == "on");
-    if (e != hintergrund_schwarz) {
-      hintergrund_schwarz = e;
-      preferences_speichern = true;
-    }
-    s = webserver.arg("epmin");
-    uint32_t epmin = s.toInt();
-    s = webserver.arg("epmax");
-    uint32_t epmax = s.toInt();
-    if (epmax < epmin) epmax = epmin;
-    if (effekt_pause_min != epmin) {
-      effekt_pause_min = epmin;
-      preferences_speichern = true;
-    }
-    if (effekt_pause_max != epmax) {
-      effekt_pause_max = epmax;
-      preferences_speichern = true;
-    }
-    webserver_send_redirect("/");
     break;
   }
 }

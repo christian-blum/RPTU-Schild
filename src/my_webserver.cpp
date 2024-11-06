@@ -80,13 +80,16 @@ const char *updatePage = R"literal(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8"> 
   <body>
-    <h2>ESP Firmware Update</h2>
+    <h2>ESP Software-Update</h2>
     <form method='POST' enctype='multipart/form-data' id='upload-form'>
       <input type='file' id='file' name='update'>
       <input type='submit' value='Update'>
     </form>
-    <br>
+    <br/>
     <div id='prg' style='width:0;color:white;text-align:center'>0%</div>
+    <br/>
+    <br/>
+    <p><a href="[@REF]">zur&uuml;ck</a></p>
   </body>
   <script>
     var prg = document.getElementById('prg');
@@ -119,10 +122,12 @@ const char *config_page = R"literal(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8"> 
   <body>
-    <h2>ESP config</h2>
+    <h2>ESP Setup</h2>
     <p><a href='/admin'>Administratoreinstellungen</a></p>
     <p><a href='/netconfig'>Netzwerkeinstellungen</a></p>
     <p><a href='/update'>OTA-Update</a></p>
+    <br/>
+    <p><a href='/'>zur&uuml;ck</a></p>
   </body>
 )literal";
 
@@ -174,11 +179,17 @@ void handleUpdate() {
 }
 
 void handle_update_form() {
-  WEBSERVER_ADMIN(webserver.send(200, "text/html", updatePage);)
+  String reply = String(updatePage);
+  String referer = webserver.header("Referer");
+  reply.replace("[@REF]", webserver_quote_special(referer));
+  WEBSERVER_ADMIN(webserver.send(200, "text/html", reply);)
 }
 
 void webserver_show_config_page() {
-  webserver.send(200, "text/html", config_page);
+  String reply = String(config_page);
+  String referer = webserver.header("Referer");
+  reply.replace("[@REF]", webserver_quote_special(referer));
+  webserver.send(200, "text/html", reply);
 }
 
 void handle_root_redirect_to_config() {
@@ -215,6 +226,7 @@ void webserver_show_admin_form() {
   </head>
   <body>
     <h2>ESP Administratoreinstellungen</h2>
+    <p>Wenn ein Administrator konfiguriert wurde, sind alle Einstellungen vor unbefugter &Auml;nderung gesch&uuml;tzt.</p>
     <form name='admin' method='POST' enctype='multipart/form-data' id='admin-form'>
       <table border=0>
         <tr><td align='right'>Admin-Benutzername</td><td><input type='text' name='username' value='[@USER]' size=32 /></td></tr>
@@ -223,6 +235,8 @@ void webserver_show_admin_form() {
       </table>
       <input type='hidden' name='referer' value='[@REF]' />
     </form>
+    <br/>
+    <p><a href="[@REF]">zur&uuml;ck</a></p>
   </body>
   )";
 
@@ -235,6 +249,7 @@ void webserver_show_admin_form() {
 }
 
 void webserver_save_admin_form() {
+  if (!webserver_admin_auth()) return;
   if (webserver.hasArg("username")) {
     String x = webserver.arg("username");
     const char *xc = x.c_str();
@@ -289,7 +304,7 @@ void webserver_setup() {
 #endif
 
   webserver.begin();
-  Serial.printf("Webserver bereit http://%s.local/ oder http://esp32.local/ oder http://%s/\n", wifi_hostname, wifi_ip.toString().c_str());
+  Serial.printf("Webserver bereit http://%s.local/ oder http://esp32.local/\n", wifi_hostname);
 }
 
 
