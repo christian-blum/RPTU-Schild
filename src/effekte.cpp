@@ -23,7 +23,7 @@ struct sCRGBA ls_credits_hintergrundfarbe = { .x = 0xfc000000 };
 struct sCRGBA ls_credits_schriftfarbe = { .x = 0xfc00c000 };
 
 Effekt_Laufschrift effekt_laufschrift_releaseInfo(false, true, 10, "el_swver", "Laufschrift SW Version", releaseInfo, 17, 50, ls_releaseInfo_schriftfarbe, ls_releaseInfo_hintergrundfarbe);
-Effekt_Laufschrift effekt_laufschrift_credits(false, true, 50,  "el_credits", "Laufschrift Credits", credits, 8, 50, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
+Effekt_Laufschrift effekt_laufschrift_credits(false, true, 30,  "el_credits", "Laufschrift Credits", credits, 8, 50, ls_credits_schriftfarbe, ls_credits_hintergrundfarbe);
 Effekt_GIMP effekt_smiley_grinsend(false, true, 100, &gimp_smiley_grinsend, 4000);
 
 std::array<Effekt *, 3> effekte_prototypen = {
