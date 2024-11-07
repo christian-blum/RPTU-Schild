@@ -79,6 +79,7 @@ bool Uebergang_Slot_Machine::uebergang_morph(struct sKonfiguration *alt, struct 
   x.u = morph_position(alt->u, neu->u, morph_step, morph_steps);
   x.schriftfarbe = morph_color(alt->schriftfarbe, neu->schriftfarbe, morph_step, morph_steps);
   x.hintergrundfarbe = morph_color(alt->hintergrundfarbe, neu->hintergrundfarbe, morph_step, morph_steps);
+  x.wrapY = true;
 
   morph_step++;
   uebergang_queueKonfiguration(&x, ((morph_step == morph_steps + 1) && (morph_steps>3)) ? morph_delay_ende : morph_delay);
