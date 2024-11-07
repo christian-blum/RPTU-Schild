@@ -11,13 +11,11 @@
 #include "bluetooth_stuff.h"
 #endif
 
-volatile bool semaphore_osd_entfernen;
 volatile bool semaphore_osd_helligkeit;
 volatile bool semaphore_osd_effekte;
 volatile bool semaphore_bt_taste_ein_aus_pairing_clear;
 
 bool osd_effekte_sichtbar;
-volatile bool semaphore_restart;    // manche Sachen kann man nur in setup() machen...
 
 
 static void zeichneAusgefuelltesRechteck(struct sCRGBA *layer, sCRGBA farbe, int16_t obenLinksX, int16_t obenLinksY, uint16_t breite, uint16_t hoehe) {
@@ -130,27 +128,18 @@ static void zeichneSchalter(char *ueberschrift, bool schalter) {
 
 cb_scheduler_handle_t taskOSDentfernen;
 
-static void ARDUINO_ISR_ATTR OSD_entfernen() { // wird nur aus dem Interrupt aufgerufen
-  taskOSDentfernen = 0;  // wird im Interrupt vom Heap entfernt, wir löschen deshalb unseren Pointer auch.
-  semaphore_osd_entfernen = true;
-}
-
-static void OSD_ggf_entfernen() {
-  if (semaphore_osd_entfernen) {
-    semaphore_osd_entfernen = false;
-    osd_effekte_sichtbar = false;
+static void OSD_entfernen() { // wird nur aus dem Interrupt aufgerufen
     ledMatrix_updateLayer(LAYER_OSD, NULL);
     semaphore_ledMatrix_update = true;
-    if (semaphore_restart) {
-      ledMatrix_aus();
-      ESP.restart();
-    }
-  }
+#ifdef HAVE_BLUETOOTH
+    osd_bt_level = 0;
+#endif
+  taskOSDentfernen = 0;  // wird im Interrupt vom Heap entfernt, wir löschen deshalb unseren Pointer auch.
 }
 
 static void OSD_Entfernen_schedulen() {
     if (!taskOSDentfernen) {
-      scheduler.callMeInMilliseconds(OSD_entfernen, OSD_DAUER);
+      taskOSDentfernen = scheduler.callMeInMilliseconds(OSD_entfernen, OSD_DAUER);
     }
     else {
       scheduler.rescheduleInMilliseconds(taskOSDentfernen, OSD_DAUER);
@@ -188,15 +177,6 @@ void OSD_bluetooth_zustand(char *text, struct sCRGBA farbe_schrift) {
 
 
 void osd_loop() { 
-  if (semaphore_osd_entfernen) {
-    semaphore_osd_entfernen = false;
-    ledMatrix_updateLayer(LAYER_OSD, NULL);
-    semaphore_ledMatrix_update = true;
-#ifdef HAVE_BLUETOOTH
-    osd_bt_level = 0;
-#endif
-  }
-
   if (semaphore_osd_helligkeit) {
     semaphore_osd_helligkeit = false;
     zeigeHelligkeitAn();
@@ -232,5 +212,4 @@ void osd_loop() {
     }
   }
 #endif
-  OSD_ggf_entfernen();
 }
