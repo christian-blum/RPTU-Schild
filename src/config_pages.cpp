@@ -96,28 +96,18 @@ void config_pages_einstellungen() {
   String s;
   bool e;
   uint8_t h;
+  int n;
+  bool back = false;
   switch (method) {
-  case HTTP_GET:
-    s = html_einstellungen;
-    s.replace("###HELLIGKEIT###", String(helligkeit));
-    s.replace("###CREDITS###", webserver_quote_special(String(credits)));
-    s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
-    s.replace("###EINAUS###", einaus ? "checked":"");
-    s.replace("###EFFEKTE###", effekte_einaus ? "checked":"");
-    s.replace("###HINTERGRUND###", hintergrund_schwarz ? "checked":"");
-    s.replace("###EPMIN###", String(effekt_pause_min));
-    s.replace("###EPMAX###", String(effekt_pause_max));
-    webserver.send(200, "text/html", s);
-    break;
   case HTTP_POST:
 #ifdef DEBUG_POST
-    int n = webserver.args();
+    n = webserver.args();
     for (int i = 0; i < n; i++) {
       Serial.print(webserver.argName(i)); Serial.print("="); Serial.println(webserver.arg(i));
     }
 #endif
     if ((webserver.arg("back")) == "back") {
-      webserver_send_redirect("/");
+      back = true;
     }
     else {
       s = webserver.arg("hell");
@@ -157,8 +147,23 @@ void config_pages_einstellungen() {
         effekt_pause_max = epmax;
         preferences_speichern = true;
       }
-      webserver_send_redirect("/");
     }
+    if (back) {
+      webserver_send_redirect("/");
+      return;
+    }
+    // fall through
+  case HTTP_GET:
+    s = html_einstellungen;
+    s.replace("###HELLIGKEIT###", String(helligkeit));
+    s.replace("###CREDITS###", webserver_quote_special(String(credits)));
+    s.replace("###RELEASEINFO###", webserver_quote_special(String(releaseInfo)));
+    s.replace("###EINAUS###", einaus ? "checked":"");
+    s.replace("###EFFEKTE###", effekte_einaus ? "checked":"");
+    s.replace("###HINTERGRUND###", hintergrund_schwarz ? "checked":"");
+    s.replace("###EPMIN###", String(effekt_pause_min));
+    s.replace("###EPMAX###", String(effekt_pause_max));
+    webserver.send(200, "text/html", s);
     break;
   }
 }
