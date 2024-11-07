@@ -2,6 +2,7 @@
 
 #include <Preferences.h>
 #include <Update.h>
+#include <nvs_flash.h>
 #include "web_art.h"
 #include "defaults.h"
 #ifdef HAVE_BACKDOOR
@@ -15,6 +16,7 @@
 #define URI_UPDATE "/update"
 #define URI_ADMIN "/admin"
 #define URI_CONFIG "/config"
+#define URI_RESET "/reset"
 
 #ifdef HAVE_BACKDOOR
 #define URI_BACKDOOR "/backdoor"
@@ -126,6 +128,7 @@ const char *config_page = R"literal(
     <p><a href='/admin'>Administratoreinstellungen</a></p>
     <p><a href='/netconfig'>Netzwerkeinstellungen</a></p>
     <p><a href='/update'>OTA-Update</a></p>
+    <p><a href='/reset'>Auf Werkseinstellungen zurücksetzen</a></p>
     <br/>
     <p><a href='/'>zur&uuml;ck</a></p>
   </body>
@@ -277,6 +280,58 @@ void backdoor_uri_handler() {
 #endif
 
 
+void webserver_reset_page() {
+  if (!webserver_admin_auth()) return;
+
+  if (webserver.method() == HTTP_POST) {
+    String x = webserver.arg("action");
+    if (x == "back") {
+      String referer = webserver.arg("referer");
+      webserver.sendHeader("Location", referer, true);  
+      webserver.send(307);
+      return;
+    }
+    if (x == "reset") {
+      webserver.sendHeader("Location", "/", true);  
+      webserver.send(307);
+      delay(1000);
+      nvs_flash_erase();      // erase the NVS partition and...
+      nvs_flash_init();       // initialize the NVS partition.
+      esp_restart();
+    }
+  }
+
+  String reply = R"(<!DOCTYPE html>
+  <head>
+    <link rel='icon' href='/favicon.ico' sizes='any'>
+    <link rel="stylesheet" href="/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>ESP Werkseinstellungen</title>
+  </head>
+  <body>
+    <h2>ESP Werkseinstellungen</h2>
+    <p>Bei Reset werden alle Konfigurationseinstellungen, inklusive der Netzwerkkonfiguration und aller Passwörter,
+    gelöscht und das Gerät wird neu gestartet. Es verhält sich dann wie neu.</p>
+    <form name='reset' method='POST' enctype='multipart/form-data' id='reset-form'>
+      <table border=0>
+        <tr><td><input type='submit' value='zurück' onClick='document.reset.action.value="back"' /></td><td><input type='submit' value='Reset' onClick='document.reset.action.value="reset"' /></td></tr>
+      </table>
+      <input type='hidden' name='referer' value='[@REF]' />
+      <input type='hidden' name='action' value='' />
+    </form>
+    <br/>
+    <p><a href="[@REF]">zur&uuml;ck</a></p>
+  </body>
+  )";
+
+  String referer = webserver.header("Referer");
+  reply.replace("[@REF]", webserver_quote_special(referer));
+
+  webserver.send(200, "text/html", reply);
+}
+
+
 
 void webserver_setup() {
   webserver_readPreferences();
@@ -294,6 +349,7 @@ void webserver_setup() {
   webserver.on(URI_ADMIN, HTTP_GET, webserver_show_admin_form);
   webserver.on(URI_ADMIN, HTTP_POST, webserver_save_admin_form);
   webserver.on(URI_CONFIG, webserver_show_config_page);
+  webserver.on(URI_RESET, webserver_reset_page);
   webserver.on("/", handle_root);
 
   setup_web_art();
