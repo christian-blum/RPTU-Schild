@@ -130,8 +130,10 @@ void Effekt_Laufschrift::prefs_laden(Preferences& p) {
     hintergrundfarbe.x = p.getULong(PREF_HINTERGRUNDFARBE, hintergrundfarbe.x);
   }
   if (p.isKey(PREF_ANZEIGETEXT)) {
-    String t = p.getString(PREF_ANZEIGETEXT, anzeigetext);
-    neuer_text(t.c_str());
+    if (loeschbar) { // ist wohl nicht sinnvoll, die unlöschbaren Laufschriften aus dem NVS zu laden...
+      String t = p.getString(PREF_ANZEIGETEXT, anzeigetext);
+      neuer_text(t.c_str());
+    }
   }
   if (p.isKey(PREF_YPOS)) {
     ypos = p.getShort(PREF_YPOS, ypos);
