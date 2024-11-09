@@ -3,6 +3,8 @@
 
 #include <Preferences.h>
 
+#ifdef HAVE_BACKDOOR
+
 Backdoor::Backdoor() {
   username = nullptr;
   password = nullptr;
@@ -116,3 +118,4 @@ void Backdoor::uri_handler() {
   webserver.send(200, "text/html", reply);
 }
 
+#endif

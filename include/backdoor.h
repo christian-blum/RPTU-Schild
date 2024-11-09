@@ -1,6 +1,10 @@
 #ifndef __BACKDOOR_H
 #define __BACKDOOR_H
 
+#include "defaults.h"
+
+#ifdef HAVE_BACKDOOR
+
 #include <Arduino.h>
 
 #define PREF_NAMESPACE_BACKDOOR "backdoor"
@@ -25,5 +29,7 @@ public:
   void uri_handler();
 
 };
+
+#endif
 
 #endif
