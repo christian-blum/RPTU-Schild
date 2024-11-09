@@ -1,9 +1,9 @@
 #include "backdoor.h"
-#include "my_webserver.h"
-
-#include <Preferences.h>
 
 #ifdef HAVE_BACKDOOR
+
+#include "my_webserver.h"
+#include <Preferences.h>
 
 Backdoor::Backdoor() {
   username = nullptr;
