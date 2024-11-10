@@ -28,6 +28,7 @@
 #include "uebergaenge.h"
 #include "rptu_stuff.h"
 #include "tasten.h"
+#include "text_5x7.h"
 
 
 
@@ -50,13 +51,7 @@
 
 
 
-
-
 CB_Scheduler scheduler;
-
-
-
-
 
 
 
@@ -90,32 +85,6 @@ uint32_t generateRandomSeed() {
     seedByteValue = 0;  }
   return (seedWordValue);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void show_chip_data() {
   uint32_t chipId = 0;
@@ -161,7 +130,6 @@ void test_reset() {
   if (x) zuruecksetzen();
 }
 
-#include "text_5x7.h"
 
 void setup() {
 #ifdef DEBUG

@@ -1,10 +1,10 @@
 #include <Arduino.h>
+#include <key_debouncer.h>
 
 #include "tasten.h"
 #include "einstellungen.h"
 #include "pins.h"
 #include "osd.h"
-#include "cb_scheduler.h"
 #include "led_matrix.h"
 #include "defaults.h"
 
@@ -14,113 +14,70 @@
  *                                                            *
  **************************************************************/
 
-#define ENTPRELLUNG_MAX 10
-#define ENTPRELLUNG_SCHWELLE 7
-
-
-Taste t_einaus(EINAUS_PIN);
-Taste t_dunkler(DUNKLER_PIN);
-Taste t_heller(HELLER_PIN);
-Taste t_effekt(EFFEKTE_EINAUS_PIN);
+KeyDebouncer taste_einaus(EINAUS_PIN, false);
+KeyDebouncer taste_dunkler(DUNKLER_PIN, false, TASTENWIEDERHOLZEIT * 1000, 0);
+KeyDebouncer taste_heller(HELLER_PIN, false, TASTENWIEDERHOLZEIT * 1000, 0);
+KeyDebouncer taste_effekt(EFFEKTE_EINAUS_PIN, false);
 #ifdef HAVE_BLUETOOTH
-Taste t_bluetooth(BT_EINAUSPAIRINGCLEAR_PIN);
+KeyDebouncer taste_bluetooth(BT_EINAUSPAIRINGCLEAR_PIN, false);
+#endif
+
+
+static void taste_einaus_gedrueckt() {
+  einaus = !einaus;
+  semaphore_ledMatrix_update = true;
+  preferences_speichern = true;
+}
+
+static void taste_heller_gedrueckt() {
+  semaphore_osd_helligkeit = true;
+  if (helligkeit < HELLIGKEIT_MAX) {
+    helligkeit++;
+    semaphore_ledMatrix_update = true;
+    preferences_speichern = true;
+  }
+}
+
+static void taste_dunkler_gedrueckt() {
+  semaphore_osd_helligkeit = true;
+  if (helligkeit > HELLIGKEIT_MIN) {
+    helligkeit--;
+    semaphore_ledMatrix_update = true;
+    preferences_speichern = true;
+  }
+}
+
+static void taste_effekt_gedrueckt() {
+  semaphore_osd_effekte = true;
+  if (osd_effekte_sichtbar) {
+    effekte_einaus = !effekte_einaus;
+  }
+  preferences_speichern = true;
+}
+
+#ifdef HAVE_BLUETOOTH
+
+static void taste_bluetooth_gedrueckt() {
+  // FIXME das müsste halt noch jemand schreiben :-)
+}
+
 #endif
 
 void tasten_setup() {
-  t_einaus.begin();
-  t_heller.begin();
-  t_dunkler.begin();
-  t_effekt.begin();
+  taste_einaus.begin();
+  taste_einaus.callMeIfPressedOnLoop(taste_einaus_gedrueckt);
+  taste_heller.begin();
+  taste_heller.callMeIfPressedOnLoop(taste_heller_gedrueckt);
+  taste_dunkler.begin();
+  taste_dunkler.callMeIfPressedOnLoop(taste_dunkler_gedrueckt);
+  taste_effekt.begin();
+  taste_effekt.callMeIfPressedOnLoop(taste_effekt_gedrueckt);
 #ifdef HAVE_BLUETOOTH
-  t_bluetooth.begin();
+  taste_bluetooth.begin();
+  taste_bluetooth.callMeIfPressedOnLoop(taste_bluetooth_gedrueckt);
 #endif
 }
-
-
-
-void t_heller_repeat() {
-  if (t_heller.aktiv()) {
-    semaphore_osd_helligkeit = true;
-    if (helligkeit < HELLIGKEIT_MAX) {
-      helligkeit++;
-      scheduler.callMeInMilliseconds(t_heller_repeat, TASTENWIEDERHOLZEIT);
-      semaphore_ledMatrix_update = true;
-      preferences_speichern = true;
-    }
-  }
-}
-
-void t_dunkler_repeat() {
-  if (t_dunkler.aktiv()) {
-    semaphore_osd_helligkeit = true;
-    if (helligkeit > HELLIGKEIT_MIN) {
-      helligkeit--;
-      scheduler.callMeInMilliseconds(t_dunkler_repeat, TASTENWIEDERHOLZEIT);
-      semaphore_ledMatrix_update = true;
-      preferences_speichern = true;
-    }
-  }
-}
-
 
 void tasten_loop() {
-  t_einaus.loop();
-  t_heller.loop();
-  t_dunkler.loop();
-  t_effekt.loop();
-#ifdef HAVE_BLUETOOTH
-  t_bluetooth.loop();
-#endif
-
-  if (t_einaus.zustandswechsel()) {
-    if (t_einaus.aktiv()) {
-      einaus = !einaus;
-      preferences_speichern = true;
-    }
-  }
-  if (t_heller.zustandswechsel()) {
-    t_heller_repeat();
-  }
-  if (t_dunkler.zustandswechsel()) {
-    t_dunkler_repeat();
-  }
-  if (t_effekt.zustandswechsel()) {
-    if (t_effekt.aktiv()) {
-      semaphore_osd_effekte = true;
-      if (osd_effekte_sichtbar) {
-        effekte_einaus = !effekte_einaus;
-      }
-      preferences_speichern = true;
-    }
-  }
-}
-
-
-Taste::Taste(int pin) {
-  Taste::pin = pin;
-}
-
-void Taste::begin() {
-  pinMode(pin, INPUT_PULLDOWN);
-}
-
-void Taste::loop() {
-  bool x = digitalRead(pin);
-  if (x && count < ENTPRELLUNG_MAX) count++;
-  else if (!x && count > -ENTPRELLUNG_MAX) count--;
-  bool z = aktiv();
-  if (z != zustand) {
-    aenderung = true;
-    zustand = z;
-  }
-}
-
-bool Taste::aktiv() {
-  return count >= ENTPRELLUNG_SCHWELLE;
-}
-
-bool Taste::zustandswechsel() {
-  bool zw = aenderung;
-  aenderung = false;
-  return zw;
+  key_debouncer_loop();
 }
