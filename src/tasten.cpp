@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <key_debouncer.h>
+#include <KeyDebouncer.h>
 
 #include "tasten.h"
 #include "einstellungen.h"
@@ -79,5 +79,5 @@ void tasten_setup() {
 }
 
 void tasten_loop() {
-  key_debouncer_loop();
+  KeyDebouncer_loop();
 }

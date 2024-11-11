@@ -1,17 +1,14 @@
 #include <Arduino.h>
 #include "cb_scheduler.h"
 
-#undef USE_MALLOC
-
 
 CB_Scheduler::CB_Scheduler() {
-
 }
 
 bool CB_Scheduler::begin() {
   timer = timerBegin(0, SCHEDULER_PRESCALER, true);
   if (!timer) {
-    log_e("no timer available");
+    log_e("timer 0 not available");
     return false;
   }
   timerStart(timer);
@@ -33,11 +30,7 @@ cb_scheduler_handle_t CB_Scheduler::makeHandle() {
 }
 
 CB_Scheduler::sSE *CB_Scheduler::makeEventStruct() {
-#ifdef USE_MALLOC
-  sSE *x = (sSE *)malloc(sizeof(sSE));
-#else
   sSE *x = new sSE;
-#endif
   memset(x, 0, sizeof(sSE));
   x->handle = makeHandle();
   return x;
@@ -82,6 +75,7 @@ cb_scheduler_handle_t CB_Scheduler::setMeInSeconds(volatile bool *flag, uint32_t
 }
 
 #define FOOLPROOF
+
 #ifndef FOOLPROOF
 
 // funktioniert nicht wirklich
@@ -102,7 +96,7 @@ size_t CB_Scheduler::divisionSearch(uint64_t x) {
 
 #else
 
-// das hier funktioniert verlässlich
+// das hier funktioniert verlässlich und ist schnell genug
 size_t CB_Scheduler::divisionSearch(uint64_t x) {
   int m = 0;
   while (m < e.size() && (*e[m]).when<x) m++;
@@ -118,11 +112,7 @@ bool CB_Scheduler::cancel(cb_scheduler_handle_t handle) {
   while (x < e.end()) {
     if (handle == (*x)->handle) {
       e.erase(x);
-#ifdef USE_MALLOC
-      free(*x);
-#else
       delete (*x);
-#endif
       found = true;
       break;
     }
@@ -170,11 +160,7 @@ void CB_Scheduler::loop() {
         scheduleEvent(x);
       }
       else {
-#ifdef USE_MALLOC
-        free(x);
-#else
         delete x;
-#endif
       }
       fired = true;
     }
